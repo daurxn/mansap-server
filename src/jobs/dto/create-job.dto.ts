@@ -11,8 +11,6 @@ import {
   MaxLength,
   MinLength,
   ArrayMinSize,
-  IsUrl,
-  IsIn,
 } from 'class-validator';
 
 export class CreateJobDto {
