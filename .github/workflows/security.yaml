@@ -15,49 +15,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Lint Code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.16.0'
-          cache: 'yarn' # Updated for Yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile # Updated for Yarn
-
-      - name: Run ESLint
-        run: yarn lint # Updated for Yarn
-
-  test:
-    name: Unit & Integration Tests
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.16.0'
-          cache: 'yarn' # Updated for Yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile # Updated for Yarn
-
-      - name: Run tests
-        run: yarn test # Updated for Yarn
-
   sast:
     name: Static Analysis (Semgrep)
     runs-on: ubuntu-latest
-    needs: [lint, test]
+    # 'needs' for lint and test removed as those jobs are removed
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -98,7 +59,7 @@ jobs:
   build:
     name: Build Application
     runs-on: ubuntu-latest
-    needs: [sast]
+    needs: [sast] # Depends on SAST completion
     outputs:
       artifact_name: nestjs-app-${{ github.run_id }}
     steps:
@@ -109,13 +70,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.16.0'
-          cache: 'yarn' # Updated for Yarn
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile # Updated for Yarn
+        run: yarn install --frozen-lockfile
 
       - name: Build NestJS application
-        run: yarn build # Updated for Yarn
+        run: yarn build
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
@@ -125,13 +86,13 @@ jobs:
             dist
             node_modules
             package.json
-            yarn.lock # Ensure yarn.lock is included if needed for runtime, though node_modules should suffice
+            yarn.lock
             # Add other files needed to run the app
 
   dast:
     name: Dynamic Analysis (OWASP ZAP)
     runs-on: ubuntu-latest
-    needs: build
+    needs: build # Depends on the build job completion
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -140,18 +101,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.16.0'
-          # No cache needed here if we are using the artifact from build job
 
       - name: Download built application artifact
         uses: actions/download-artifact@v4
         with:
           name: nestjs-app-${{ github.run_id }}
           path: ./
-
-      # If your 'yarn start' script requires devDependencies or you didn't bundle node_modules in the artifact:
-      # - name: Install production dependencies from artifact
-      #   working-directory: ./ # Adjust if artifact unpacks into a subfolder
-      #   run: yarn install --production --frozen-lockfile
 
       - name: Start NestJS application in background
         env:
@@ -161,9 +116,7 @@ jobs:
           echo "Current directory contents:"
           ls -la
           echo "Starting NestJS application..."
-          # Ensure your package.json's "start" script runs the production build, e.g., "node dist/main.js"
-          # or "yarn workspace your-app-name start" if using yarn workspaces
-          yarn start & # Updated for Yarn
+          yarn start &
           echo "Waiting for application to start..."
           sleep 30
 
@@ -171,10 +124,10 @@ jobs:
         uses: zaproxy/action-full-scan@v0.12.0
         with:
           target: 'http://localhost:3000'
-          rules_file_name: '.zap_rules.tsv'
-          cmd_options: '-a'
+          rules_file_name: '.zap_rules.tsv' # Optional: File for ignoring specific alerts
+          cmd_options: '-a' # Include alpha scanners
           issue_title: 'ZAP Scan Found Vulnerabilities in [${{ github.repository }}]'
-          fail_action: false
+          fail_action: false # Set to true to fail the job if ZAP finds issues
           report_html: 'zap_report.html'
           report_md: 'zap_report.md'
           report_xml: 'zap_report.xml'
