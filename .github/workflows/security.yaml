@@ -1,18 +1,18 @@
 name: NestJS DevSecOps CI Pipeline
 
 permissions:
-  contents: read      # Allow checkout
-  actions: read       # Allow triggering other workflows (if needed)
-  security-events: write # Allow uploading SARIF reports to GitHub Advanced Security
-  issues: write       # Allow ZAP to create issues
-  pull-requests: write # Allow ZAP to comment on PRs
+  contents: read
+  actions: read
+  security-events: write
+  issues: write
+  pull-requests: write
 
 on:
   push:
-    branches: [ main ] # Updated branch
+    branches: [ main ]
   pull_request:
-    branches: [ main ] # Updated branch
-  workflow_dispatch: # Allows manual triggering
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -25,19 +25,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.16.0' # Updated Node.js version
-          cache: 'npm' # Or 'yarn'
+          node-version: '20.16.0'
+          cache: 'yarn' # Updated for Yarn
 
       - name: Install dependencies
-        run: npm ci # Or yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile # Updated for Yarn
 
       - name: Run ESLint
-        run: npm run lint # Assumes you have a 'lint' script in package.json
+        run: yarn lint # Updated for Yarn
 
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
-    needs: lint # Optional: run after linting
+    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,22 +45,22 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.16.0' # Updated Node.js version
-          cache: 'npm' # Or 'yarn'
+          node-version: '20.16.0'
+          cache: 'yarn' # Updated for Yarn
 
       - name: Install dependencies
-        run: npm ci # Or yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile # Updated for Yarn
 
       - name: Run tests
-        run: npm run test # Assumes you have a 'test' script for unit tests
+        run: yarn test # Updated for Yarn
 
   sast:
     name: Static Analysis (Semgrep)
     runs-on: ubuntu-latest
-    needs: [lint, test] # Run SAST after linting and basic tests pass
+    needs: [lint, test]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Updated to v4 for consistency
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -108,14 +108,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.16.0' # Updated Node.js version
-          cache: 'npm'
+          node-version: '20.16.0'
+          cache: 'yarn' # Updated for Yarn
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile # Updated for Yarn
 
       - name: Build NestJS application
-        run: npm run build
+        run: yarn build # Updated for Yarn
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
@@ -125,6 +125,7 @@ jobs:
             dist
             node_modules
             package.json
+            yarn.lock # Ensure yarn.lock is included if needed for runtime, though node_modules should suffice
             # Add other files needed to run the app
 
   dast:
@@ -132,42 +133,48 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code # Still useful if ZAP needs to access any non-built files or for context
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.16.0' # Updated Node.js version
+          node-version: '20.16.0'
+          # No cache needed here if we are using the artifact from build job
 
       - name: Download built application artifact
         uses: actions/download-artifact@v4
         with:
-          name: nestjs-app-${{ github.run_id }} # Use the output from the build job
+          name: nestjs-app-${{ github.run_id }}
           path: ./
+
+      # If your 'yarn start' script requires devDependencies or you didn't bundle node_modules in the artifact:
+      # - name: Install production dependencies from artifact
+      #   working-directory: ./ # Adjust if artifact unpacks into a subfolder
+      #   run: yarn install --production --frozen-lockfile
 
       - name: Start NestJS application in background
         env:
           NODE_ENV: production
-          PORT: 3000 # Ensure ZAP targets this port
+          PORT: 3000
         run: |
           echo "Current directory contents:"
           ls -la
           echo "Starting NestJS application..."
           # Ensure your package.json's "start" script runs the production build, e.g., "node dist/main.js"
-          # If you have a specific production start script like "start:prod", use: npm run start:prod &
-          npm start &
+          # or "yarn workspace your-app-name start" if using yarn workspaces
+          yarn start & # Updated for Yarn
           echo "Waiting for application to start..."
-          sleep 30 # Adjust as needed for your application's startup time
+          sleep 30
 
       - name: ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.12.0 # Check for latest version
+        uses: zaproxy/action-full-scan@v0.12.0
         with:
           target: 'http://localhost:3000'
           rules_file_name: '.zap_rules.tsv'
           cmd_options: '-a'
           issue_title: 'ZAP Scan Found Vulnerabilities in [${{ github.repository }}]'
-          fail_action: false # Set to true to fail the job if ZAP finds issues
+          fail_action: false
           report_html: 'zap_report.html'
           report_md: 'zap_report.md'
           report_xml: 'zap_report.xml'
