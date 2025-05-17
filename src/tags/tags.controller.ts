@@ -31,8 +31,8 @@ export class TagsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
-    return this.tagsService.update(+id, updateTagDto);
+  update(@Param('id') id: string) {
+    return this.tagsService.update(+id);
   }
 
   @Delete(':id')
