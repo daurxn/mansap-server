@@ -56,38 +56,38 @@ jobs:
   #         sarif_file: semgrep_report.sarif
   #         category: semgrep
 
-  # build:
-  #   name: Build Application
-  #   runs-on: ubuntu-latest
-  #   needs: [sast] # Depends on SAST completion
-  #   outputs:
-  #     artifact_name: nestjs-app-${{ github.run_id }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [sast] # Depends on SAST completion
+    outputs:
+      artifact_name: nestjs-app-${{ github.run_id }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20.16.0'
-  #         cache: 'yarn'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0'
+          cache: 'yarn'
 
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-  #     - name: Build NestJS application
-  #       run: yarn build
+      - name: Build NestJS application
+        run: yarn build
 
-  #     - name: Archive production artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: nestjs-app-${{ github.run_id }}
-  #         path: |
-  #           dist
-  #           node_modules
-  #           package.json
-  #           yarn.lock
-  #           # Add other files needed to run the app
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nestjs-app-${{ github.run_id }}
+          path: |
+            dist
+            node_modules
+            package.json
+            yarn.lock
+            # Add other files needed to run the app
   dast:
     name: Dynamic Analysis (OWASP ZAP)
     runs-on: ubuntu-latest
