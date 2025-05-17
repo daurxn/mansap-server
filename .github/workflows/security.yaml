@@ -71,20 +71,57 @@ jobs:
       - name: Build application
         run: yarn build
 
+      - name: Create .zap directory
+        run: mkdir -p .zap
+
       - name: Start NestJS application
         run: |
-          yarn start:prod &
-          sleep 10  # Wait for the application to start
+          # Start the application in the background
+          yarn start:prod > app.log 2>&1 &
+          APP_PID=$!
+          
+          # Wait for the application to start
+          echo "Waiting for application to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "Application is up and running!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Application failed to start. Logs:"
+              cat app.log
+              exit 1
+            fi
+            echo "Attempt $i: Waiting for application to start..."
+            sleep 2
+          done
+          
+          # Store the PID for later cleanup
+          echo $APP_PID > app.pid
+
+      - name: Verify application is running
+        run: |
+          curl -v http://localhost:3000 || true
+          netstat -tulpn || true
+          ps aux | grep node || true
 
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         with:
-          target: 'http://localhost:3000'  # Default NestJS port
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          target: 'http://localhost:3000'
+          cmd_options: '-a -j'
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: zap-report.html
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+          fi
+          # Additional cleanup if needed
+          pkill -f "node" || true
