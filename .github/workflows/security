@@ -1,0 +1,187 @@
+name: NestJS DevSecOps CI Pipeline
+
+permissions:
+  contents: read      # Allow checkout
+  actions: read       # Allow triggering other workflows (if needed)
+  security-events: write # Allow uploading SARIF reports to GitHub Advanced Security
+  issues: write       # Allow ZAP to create issues
+  pull-requests: write # Allow ZAP to comment on PRs
+
+on:
+  push:
+    branches: [ main ] # Updated branch
+  pull_request:
+    branches: [ main ] # Updated branch
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0' # Updated Node.js version
+          cache: 'npm' # Or 'yarn'
+
+      - name: Install dependencies
+        run: npm ci # Or yarn install --frozen-lockfile
+
+      - name: Run ESLint
+        run: npm run lint # Assumes you have a 'lint' script in package.json
+
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint # Optional: run after linting
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0' # Updated Node.js version
+          cache: 'npm' # Or 'yarn'
+
+      - name: Install dependencies
+        run: npm ci # Or yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: npm run test # Assumes you have a 'test' script for unit tests
+
+  sast:
+    name: Static Analysis (Semgrep)
+    runs-on: ubuntu-latest
+    needs: [lint, test] # Run SAST after linting and basic tests pass
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Updated to v4 for consistency
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep SAST
+        run: |
+          semgrep scan \
+            --config auto \
+            --exclude "test/*" \
+            --exclude "node_modules/*" \
+            --exclude "dist/*" \
+            --severity ERROR \
+            --sarif \
+            -o semgrep_report.sarif \
+            || true
+
+      - name: Upload Semgrep SARIF report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep_report.sarif
+
+      - name: Upload SARIF to GitHub Advanced Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep_report.sarif
+          category: semgrep
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [sast]
+    outputs:
+      artifact_name: nestjs-app-${{ github.run_id }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0' # Updated Node.js version
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build NestJS application
+        run: npm run build
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nestjs-app-${{ github.run_id }}
+          path: |
+            dist
+            node_modules
+            package.json
+            # Add other files needed to run the app
+
+  dast:
+    name: Dynamic Analysis (OWASP ZAP)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code # Still useful if ZAP needs to access any non-built files or for context
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.16.0' # Updated Node.js version
+
+      - name: Download built application artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nestjs-app-${{ github.run_id }} # Use the output from the build job
+          path: ./
+
+      - name: Start NestJS application in background
+        env:
+          NODE_ENV: production
+          PORT: 3000 # Ensure ZAP targets this port
+        run: |
+          echo "Current directory contents:"
+          ls -la
+          echo "Starting NestJS application..."
+          # Ensure your package.json's "start" script runs the production build, e.g., "node dist/main.js"
+          # If you have a specific production start script like "start:prod", use: npm run start:prod &
+          npm start &
+          echo "Waiting for application to start..."
+          sleep 30 # Adjust as needed for your application's startup time
+
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.12.0 # Check for latest version
+        with:
+          target: 'http://localhost:3000'
+          rules_file_name: '.zap_rules.tsv'
+          cmd_options: '-a'
+          issue_title: 'ZAP Scan Found Vulnerabilities in [${{ github.repository }}]'
+          fail_action: false # Set to true to fail the job if ZAP finds issues
+          report_html: 'zap_report.html'
+          report_md: 'zap_report.md'
+          report_xml: 'zap_report.xml'
+
+      - name: Upload ZAP Report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-html-report
+          path: zap_report.html
+
+      - name: Upload ZAP Report (Markdown)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-md-report
+          path: zap_report.md
