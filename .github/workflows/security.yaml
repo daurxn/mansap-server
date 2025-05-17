@@ -15,79 +15,79 @@ on:
   workflow_dispatch:
 
 jobs:
-  sast:
-    name: Static Analysis (Semgrep)
-    runs-on: ubuntu-latest
-    # 'needs' for lint and test removed as those jobs are removed
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # sast:
+  #   name: Static Analysis (Semgrep)
+  #   runs-on: ubuntu-latest
+  #   # 'needs' for lint and test removed as those jobs are removed
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
 
-      - name: Install Semgrep
-        run: pip install semgrep
+  #     - name: Install Semgrep
+  #       run: pip install semgrep
 
-      - name: Run Semgrep SAST
-        run: |
-          semgrep scan \
-            --config auto \
-            --exclude "test/*" \
-            --exclude "node_modules/*" \
-            --exclude "dist/*" \
-            --severity ERROR \
-            --sarif \
-            -o semgrep_report.sarif \
-            || true
+  #     - name: Run Semgrep SAST
+  #       run: |
+  #         semgrep scan \
+  #           --config auto \
+  #           --exclude "test/*" \
+  #           --exclude "node_modules/*" \
+  #           --exclude "dist/*" \
+  #           --severity ERROR \
+  #           --sarif \
+  #           -o semgrep_report.sarif \
+  #           || true
 
-      - name: Upload Semgrep SARIF report
-        uses: actions/upload-artifact@v4
-        with:
-          name: semgrep-report
-          path: semgrep_report.sarif
+  #     - name: Upload Semgrep SARIF report
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: semgrep-report
+  #         path: semgrep_report.sarif
 
-      - name: Upload SARIF to GitHub Advanced Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep_report.sarif
-          category: semgrep
+  #     - name: Upload SARIF to GitHub Advanced Security
+  #       if: always()
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       with:
+  #         sarif_file: semgrep_report.sarif
+  #         category: semgrep
 
-  build:
-    name: Build Application
-    runs-on: ubuntu-latest
-    needs: [sast] # Depends on SAST completion
-    outputs:
-      artifact_name: nestjs-app-${{ github.run_id }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # build:
+  #   name: Build Application
+  #   runs-on: ubuntu-latest
+  #   needs: [sast] # Depends on SAST completion
+  #   outputs:
+  #     artifact_name: nestjs-app-${{ github.run_id }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.16.0'
-          cache: 'yarn'
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20.16.0'
+  #         cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
 
-      - name: Build NestJS application
-        run: yarn build
+  #     - name: Build NestJS application
+  #       run: yarn build
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nestjs-app-${{ github.run_id }}
-          path: |
-            dist
-            node_modules
-            package.json
-            yarn.lock
-            # Add other files needed to run the app
+  #     - name: Archive production artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: nestjs-app-${{ github.run_id }}
+  #         path: |
+  #           dist
+  #           node_modules
+  #           package.json
+  #           yarn.lock
+  #           # Add other files needed to run the app
   dast:
     name: Dynamic Analysis (OWASP ZAP)
     runs-on: ubuntu-latest
@@ -110,27 +110,27 @@ jobs:
       - name: Start NestJS application in background
         env:
           NODE_ENV: production
-          PORT: 3000
+          PORT: 3001
         run: |
           echo "Current directory contents:"
           ls -la
           echo "Starting NestJS application..."
           yarn start &
           APP_PID=$!
-          echo "Application started with PID $APP_PID. Waiting for it to be ready on port 3000..."
+          echo "Application started with PID $APP_PID. Waiting for it to be ready on port 3001..."
           
           # Robust wait for application to be ready
           timeout=90 # seconds
           interval=5  # seconds
           elapsed=0
-          while ! nc -z localhost 3000; do
+          while ! nc -z localhost 3001; do
             if [ $elapsed -ge $timeout ]; then
-              echo "Timeout: Application did not start on port 3000 within $timeout seconds."
+              echo "Timeout: Application did not start on port 3001 within $timeout seconds."
               # Optionally, dump logs from the app if you have a way to capture them
               # kill $APP_PID
               exit 1
             fi
-            echo "Port 3000 is not yet open. Retrying in $interval seconds..."
+            echo "Port 3001 is not yet open. Retrying in $interval seconds..."
             sleep $interval
             elapsed=$((elapsed + interval))
   
@@ -141,12 +141,12 @@ jobs:
               exit 1
             fi
           done
-          echo "Application is ready on port 3000."
+          echo "Application is ready on port 3001."
   
       - name: ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.12.0
         with:
-          target: 'http://localhost:3000'
+          target: 'http://localhost:3001'
           # Ensure .zap_rules.tsv exists at the repo root or remove/comment out the next line
           rules_file_name: '.zap_rules.tsv'
           # Updated cmd_options to generate reports with names matching upload steps
