@@ -150,6 +150,8 @@ export class JobsService {
       where: { id: applicantId },
     });
 
+    console.log(applicant, jobId, coverLetter);
+
     if (!applicant) {
       throw new NotFoundException(
         `Applicant with ID ${applicantId} not found.`,
@@ -164,6 +166,8 @@ export class JobsService {
       throw new NotFoundException(`Job with ID ${jobId} not found.`);
     }
 
+    console.log(1);
+
     const existingApplication = await this.prisma.application.findFirst({
       where: {
         applicantId: applicantId,
@@ -177,11 +181,15 @@ export class JobsService {
       );
     }
 
+    console.log(2);
+
     const resume = await this.prisma.resume.findUnique({
       where: { userId: applicantId },
     });
 
     if (resume) {
+      console.log(resume, job, applicant);
+
       try {
         const newApplication = await this.prisma.application.create({
           data: {

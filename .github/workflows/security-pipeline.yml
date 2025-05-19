@@ -1,0 +1,141 @@
+name: CI Security Pipeline
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sast:
+    name: Static Code Analysis (Semgrep)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep SAST and Save Report
+        run: semgrep --config auto --exclude "test/*" --exclude "node_modules/*" --exclude "dist/*" --severity ERROR --json > semgrep_report.json
+
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep_report.json
+
+      - name: Run ESLint
+        run: yarn lint
+
+  dast:
+    name: Dynamic App Scan (OWASP ZAP)
+    runs-on: ubuntu-latest
+    needs: sast
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build application
+        run: yarn build
+
+      - name: Create .zap directory
+        run: mkdir -p .zap
+
+      - name: Start NestJS application
+        env:
+          PORT: 3001
+          HOST: 0.0.0.0
+        run: |
+          # Start the application in the background with explicit host and port
+          NODE_ENV=production PORT=3001 HOST=0.0.0.0 yarn start:prod > app.log 2>&1 &
+          APP_PID=$!
+          
+          # Wait for the application to start
+          echo "Waiting for application to start..."
+          for i in {1..30}; do
+            # Try both localhost and 0.0.0.0
+            if curl -s http://localhost:3001/api > /dev/null || curl -s http://0.0.0.0:3001/api > /dev/null; then
+              echo "Application is up and running!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Application failed to start. Logs:"
+              cat app.log
+              echo "Network status:"
+              netstat -tulpn || true
+              echo "Process status:"
+              ps aux | grep node || true
+              echo "Environment:"
+              env | grep -E "PORT|HOST|NODE" || true
+              exit 1
+            fi
+            echo "Attempt $i: Waiting for application to start..."
+            sleep 2
+          done
+          
+          # Store the PID for later cleanup
+          echo $APP_PID > app.pid
+
+      - name: Verify application is running
+        run: |
+          echo "Testing application endpoints..."
+          curl -v http://localhost:3001/api || true
+          curl -v http://0.0.0.0:3001/api || true
+          echo "Network status:"
+          netstat -tulpn || true
+          echo "Process status:"
+          ps aux | grep node || true
+
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          target: 'http://localhost:3001/api'
+          cmd_options: '-a -j'
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap-report.html
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+          fi
+          # Additional cleanup if needed
+          pkill -f "node" || true 

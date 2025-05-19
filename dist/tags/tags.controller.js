@@ -16,7 +16,6 @@ exports.TagsController = void 0;
 const common_1 = require("@nestjs/common");
 const tags_service_1 = require("./tags.service");
 const create_tag_dto_1 = require("./dto/create-tag.dto");
-const update_tag_dto_1 = require("./dto/update-tag.dto");
 let TagsController = class TagsController {
     tagsService;
     constructor(tagsService) {
@@ -31,8 +30,8 @@ let TagsController = class TagsController {
     findOne(id) {
         return this.tagsService.findOne(+id);
     }
-    update(id, updateTagDto) {
-        return this.tagsService.update(+id, updateTagDto);
+    update(id) {
+        return this.tagsService.update(+id);
     }
     remove(id) {
         return this.tagsService.remove(+id);
@@ -62,9 +61,8 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_tag_dto_1.UpdateTagDto]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], TagsController.prototype, "update", null);
 __decorate([

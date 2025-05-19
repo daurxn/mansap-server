@@ -130,6 +130,7 @@ let JobsService = class JobsService {
         const applicant = await this.prisma.user.findUnique({
             where: { id: applicantId },
         });
+        console.log(applicant, jobId, coverLetter);
         if (!applicant) {
             throw new common_1.NotFoundException(`Applicant with ID ${applicantId} not found.`);
         }
@@ -139,6 +140,7 @@ let JobsService = class JobsService {
         if (!job) {
             throw new common_1.NotFoundException(`Job with ID ${jobId} not found.`);
         }
+        console.log(1);
         const existingApplication = await this.prisma.application.findFirst({
             where: {
                 applicantId: applicantId,
@@ -148,10 +150,12 @@ let JobsService = class JobsService {
         if (existingApplication) {
             throw new common_1.ConflictException(`You have already applied for job ID ${jobId}.`);
         }
+        console.log(2);
         const resume = await this.prisma.resume.findUnique({
             where: { userId: applicantId },
         });
         if (resume) {
+            console.log(resume, job, applicant);
             try {
                 const newApplication = await this.prisma.application.create({
                     data: {

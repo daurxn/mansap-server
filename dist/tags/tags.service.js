@@ -26,7 +26,7 @@ let TagsService = class TagsService {
     findOne(id) {
         return `This action returns a #${id} tag`;
     }
-    update(id, updateTagDto) {
+    update(id) {
         return `This action updates a #${id} tag`;
     }
     remove(id) {
