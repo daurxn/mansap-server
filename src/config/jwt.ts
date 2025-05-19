@@ -1,4 +1,4 @@
 export const jwt_config = {
-  secret: 'esfesgrsg',
-  expired: '24h',
+  secret: process.env.SECRET_KEY!,
+  expired: process.env.EXPIRES_IN!,
 };
