@@ -71,20 +71,71 @@ jobs:
       - name: Build application
         run: yarn build
 
+      - name: Create .zap directory
+        run: mkdir -p .zap
+
       - name: Start NestJS application
+        env:
+          PORT: 3001
+          HOST: 0.0.0.0
         run: |
-          yarn start:prod &
-          sleep 10  # Wait for the application to start
+          # Start the application in the background with explicit host and port
+          NODE_ENV=production PORT=3001 HOST=0.0.0.0 yarn start:prod > app.log 2>&1 &
+          APP_PID=$!
+          
+          # Wait for the application to start
+          echo "Waiting for application to start..."
+          for i in {1..30}; do
+            # Try both localhost and 0.0.0.0
+            if curl -s http://localhost:3001/api > /dev/null || curl -s http://0.0.0.0:3001/api > /dev/null; then
+              echo "Application is up and running!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Application failed to start. Logs:"
+              cat app.log
+              echo "Network status:"
+              netstat -tulpn || true
+              echo "Process status:"
+              ps aux | grep node || true
+              echo "Environment:"
+              env | grep -E "PORT|HOST|NODE" || true
+              exit 1
+            fi
+            echo "Attempt $i: Waiting for application to start..."
+            sleep 2
+          done
+          
+          # Store the PID for later cleanup
+          echo $APP_PID > app.pid
+
+      - name: Verify application is running
+        run: |
+          echo "Testing application endpoints..."
+          curl -v http://localhost:3001/api || true
+          curl -v http://0.0.0.0:3001/api || true
+          echo "Network status:"
+          netstat -tulpn || true
+          echo "Process status:"
+          ps aux | grep node || true
 
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         with:
-          target: 'http://localhost:3000'  # Default NestJS port
-          rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-a'
+          target: 'http://localhost:3001/api'
+          cmd_options: '-a -j'
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: zap-report.html
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f app.pid ]; then
+            kill $(cat app.pid) || true
+          fi
+          # Additional cleanup if needed
+          pkill -f "node" || true 
