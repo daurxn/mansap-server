@@ -10,23 +10,29 @@ export declare class ProfileService {
     getProfile(userId: number): import(".prisma/client").Prisma.Prisma__ProfileClient<{
         age: number | null;
         gender: string | null;
-        bio: string | null;
         locationId: number | null;
+        bio: string | null;
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     createResume(userId: number, createResumeDto: CreateResumeDto): Promise<{
         id: number;
+        userId: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
         workExperience: string;
         education: string;
     }>;
     getResume(userId: number): Promise<{
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        userId: number;
-        workExperience: string;
-        education: string;
-    } | null>;
+        data: {
+            id: number;
+            userId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            workExperience: string;
+            education: string;
+        };
+        message: string;
+    } | {
+        message: string;
+        data?: undefined;
+    }>;
 }

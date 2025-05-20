@@ -11,23 +11,29 @@ export declare class ProfileController {
     getProfile(req: AuthenticatedRequest): import(".prisma/client").Prisma.Prisma__ProfileClient<{
         age: number | null;
         gender: string | null;
-        bio: string | null;
         locationId: number | null;
+        bio: string | null;
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     createResume(createResumeDto: CreateResumeDto, req: AuthenticatedRequest): Promise<{
         id: number;
+        userId: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
         workExperience: string;
         education: string;
     }>;
     getResume(req: AuthenticatedRequest): Promise<{
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        userId: number;
-        workExperience: string;
-        education: string;
-    } | null>;
+        data: {
+            id: number;
+            userId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            workExperience: string;
+            education: string;
+        };
+        message: string;
+    } | {
+        message: string;
+        data?: undefined;
+    }>;
 }

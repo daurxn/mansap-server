@@ -53,10 +53,9 @@ let ProfileService = class ProfileService {
     }
     async getResume(userId) {
         const resume = await this.prisma.resume.findUnique({ where: { userId } });
-        if (!resume) {
-            return null;
-        }
-        return resume;
+        return resume
+            ? { data: resume, message: 'Has resume' }
+            : { message: 'No resume' };
     }
 };
 exports.ProfileService = ProfileService;

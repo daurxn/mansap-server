@@ -61,24 +61,8 @@ export class ProfileService {
 
   async getResume(userId: number) {
     const resume = await this.prisma.resume.findUnique({ where: { userId } });
-
-    if (!resume) {
-      return null;
-    }
-
-    return resume;
+    return resume
+      ? { data: resume, message: 'Has resume' }
+      : { message: 'No resume' };
   }
-
-  // async getMissingFields(userId: number) {
-  //   const profile = await this.prisma.profile.findFirst({ where: { userId } });
-
-  //   if (!profile) {
-  //     throw new NotFoundException();
-  //   }
-
-  //   return Object.entries(profile).reduce(
-  //     (acc, [key, value]) => (value === null ? [...acc, key] : acc),
-  //     [],
-  //   );
-  // }
 }

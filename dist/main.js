@@ -8,7 +8,12 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalPipes(new common_1.ValidationPipe());
     app.setGlobalPrefix('api');
-    app.enableCors();
+    app.enableCors({
+        origin: 'https://mansap.vercel.app',
+        methods: 'GET,POST,PUT,DELETE',
+        credentials: true,
+        allowedHeaders: 'Content-Type, Authorization',
+    });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Mansap')
         .setDescription('Mansap API description')
