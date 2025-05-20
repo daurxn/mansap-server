@@ -50,6 +50,10 @@ model User {
   resume     Resume? // Relation to the Resume model
 
   applications Application[] @relation("UserApplications") // User's job applications
+
+  // Add these new relations
+  chats         ChatParticipant[]
+  sentMessages  Message[]
 }
 
 model Profile {
@@ -98,6 +102,9 @@ model Job {
   location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
 
   applications Application[] @relation("JobApplications") // Applications received for this job
+
+  // Add this new relation
+  chats         Chat[]
 
   @@index([locationId])
   @@index([postedById])
@@ -179,4 +186,63 @@ model Application {
   @@index([jobId])
   @@index([applicantId])
   @@index([resumeId])
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // The job this chat is associated with (optional, as users might chat before a job is posted)
+  jobId     Int?
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  // Chat participants
+  participants ChatParticipant[]
+  messages     Message[]
+
+  @@index([jobId])
+}
+
+model ChatParticipant {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  userId    Int
+  joinedAt  DateTime @default(now())
+  
+  // The chat and user this participant belongs to
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Last time the user read messages in this chat
+  lastReadAt DateTime?
+
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
+}
+
+model Message {
+  id        Int           @id @default(autoincrement())
+  content   String        @db.Text
+  status    MessageStatus @default(SENT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // The chat this message belongs to
+  chatId    Int
+  chat      Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  // The sender of the message
+  senderId  Int
+  sender    User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([senderId])
 }

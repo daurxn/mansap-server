@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const chat_service_1 = require("../chat/chat.service");
 let JobsService = class JobsService {
     prisma;
-    constructor(prisma) {
+    chatService;
+    constructor(prisma, chatService) {
         this.prisma = prisma;
+        this.chatService = chatService;
     }
     create(createJobDto, postedById) {
         const newJob = {
@@ -200,15 +203,39 @@ let JobsService = class JobsService {
         });
     }
     async acceptApplication(userId, jobId, applicantId) {
-        return this.prisma.job.update({
+        const job = await this.prisma.job.findFirst({
+            where: {
+                id: jobId,
+                postedById: userId,
+            },
+        });
+        if (!job) {
+            throw new common_1.NotFoundException('Job not found or you are not the job poster');
+        }
+        const application = await this.prisma.application.findFirst({
+            where: {
+                jobId,
+                applicantId,
+            },
+        });
+        if (!application) {
+            throw new common_1.NotFoundException('Application not found');
+        }
+        const updatedJob = await this.prisma.job.update({
             where: { id: jobId },
             data: { filledById: applicantId },
         });
+        await this.chatService.create({
+            participantIds: [userId, applicantId],
+            jobId,
+        });
+        return updatedJob;
     }
 };
 exports.JobsService = JobsService;
 exports.JobsService = JobsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        chat_service_1.ChatService])
 ], JobsService);
 //# sourceMappingURL=jobs.service.js.map

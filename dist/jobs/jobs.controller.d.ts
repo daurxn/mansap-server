@@ -7,11 +7,10 @@ export declare class JobsController {
     private readonly jobsService;
     constructor(jobsService: JobsService);
     create(createJobDto: CreateJobDto, req: AuthenticatedRequest): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -19,13 +18,13 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     findAll(req: AuthenticatedRequest, search?: string): Promise<({
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -33,32 +32,32 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     } & {
         applied: boolean;
         is_applicable: boolean;
     })[]>;
     findPostedByMe(req: AuthenticatedRequest): import(".prisma/client").Prisma.PrismaPromise<({
-        location: {
-            name: string;
-            id: number;
-        } | null;
         _count: {
             applications: number;
         };
-        tags: {
-            name: string;
-            id: number;
-        }[];
         postedBy: {
-            email: string;
             name: string;
+            email: string;
         };
+        tags: {
+            id: number;
+            name: string;
+        }[];
+        location: {
+            id: number;
+            name: string;
+        } | null;
     } & {
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -66,13 +65,13 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     })[]>;
     acceptApplication(req: AuthenticatedRequest, id: number, applicantId: number): Promise<{
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -80,35 +79,35 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }>;
     getApplications(req: AuthenticatedRequest): import(".prisma/client").Prisma.PrismaPromise<({
         job: {
-            location: {
-                name: string;
-                id: number;
-            } | null;
             _count: {
                 applications: number;
             };
-            tags: {
-                name: string;
-                id: number;
-            }[];
             postedBy: {
-                email: string;
-                password: string;
-                name: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                email: string;
+                password: string;
+                role: import(".prisma/client").$Enums.Role;
             };
+            tags: {
+                id: number;
+                name: string;
+            }[];
+            location: {
+                id: number;
+                name: string;
+            } | null;
         } & {
-            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            locationId: number | null;
+            name: string;
             description: string;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
@@ -116,24 +115,24 @@ export declare class JobsController {
             jobType: import(".prisma/client").$Enums.JobType;
             postedById: number;
             filledById: number | null;
+            locationId: number | null;
         };
     } & {
         id: number;
         updatedAt: Date;
         jobId: number;
-        coverLetter: string | null;
+        status: import(".prisma/client").$Enums.ApplicationStatus;
         applicantId: number;
         resumeId: number | null;
-        status: import(".prisma/client").$Enums.ApplicationStatus;
+        coverLetter: string | null;
         appliedAt: Date;
     })[]>;
     createApplication(req: AuthenticatedRequest, createApplicationDto: CreateApplicationDto): Promise<({
         job: {
-            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            locationId: number | null;
+            name: string;
             description: string;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
@@ -141,6 +140,7 @@ export declare class JobsController {
             jobType: import(".prisma/client").$Enums.JobType;
             postedById: number;
             filledById: number | null;
+            locationId: number | null;
         };
         resume: {
             id: number;
@@ -151,23 +151,31 @@ export declare class JobsController {
             education: string;
         } | null;
         applicant: {
-            email: string;
-            name: string;
             id: number;
+            name: string;
+            email: string;
         };
     } & {
         id: number;
         updatedAt: Date;
         jobId: number;
-        coverLetter: string | null;
+        status: import(".prisma/client").$Enums.ApplicationStatus;
         applicantId: number;
         resumeId: number | null;
-        status: import(".prisma/client").$Enums.ApplicationStatus;
+        coverLetter: string | null;
         appliedAt: Date;
     }) | undefined>;
     findOne(req: AuthenticatedRequest, id: string): Promise<{
         is_applicable: boolean;
         applied: boolean | null;
+        postedBy?: {
+            id: number;
+            name: string;
+            email: string;
+        } | undefined;
+        tags?: {
+            name: string;
+        }[] | undefined;
         applications?: ({
             resume: {
                 id: number;
@@ -178,37 +186,28 @@ export declare class JobsController {
                 education: string;
             } | null;
             applicant: {
-                email: string;
-                password: string;
-                name: string;
-                role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
+                email: string;
+                password: string;
+                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             id: number;
             updatedAt: Date;
             jobId: number;
-            coverLetter: string | null;
+            status: import(".prisma/client").$Enums.ApplicationStatus;
             applicantId: number;
             resumeId: number | null;
-            status: import(".prisma/client").$Enums.ApplicationStatus;
+            coverLetter: string | null;
             appliedAt: Date;
         })[] | undefined;
-        tags?: {
-            name: string;
-        }[] | undefined;
-        postedBy?: {
-            email: string;
-            name: string;
-            id: number;
-        } | undefined;
-        name?: string | undefined;
         id?: number | undefined;
         createdAt?: Date | undefined;
         updatedAt?: Date | undefined;
-        locationId?: number | null | undefined;
+        name?: string | undefined;
         description?: string | undefined;
         salary?: import("@prisma/client/runtime/library").Decimal | undefined;
         unit?: import(".prisma/client").$Enums.Unit | undefined;
@@ -216,13 +215,13 @@ export declare class JobsController {
         jobType?: import(".prisma/client").$Enums.JobType | undefined;
         postedById?: number | undefined;
         filledById?: number | null | undefined;
+        locationId?: number | null | undefined;
     }>;
     update(id: string, updateJobDto: UpdateJobDto): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -230,13 +229,13 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     remove(id: string): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
@@ -244,5 +243,6 @@ export declare class JobsController {
         jobType: import(".prisma/client").$Enums.JobType;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
 }

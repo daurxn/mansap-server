@@ -8,10 +8,14 @@ import { UpdateJobDto } from './dto/update-job.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { Job } from '@prisma/client';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class JobsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private chatService: ChatService,
+  ) {}
 
   create(createJobDto: CreateJobDto, postedById: number) {
     const newJob = {
@@ -240,9 +244,43 @@ export class JobsService {
   }
 
   async acceptApplication(userId: number, jobId: number, applicantId: number) {
-    return this.prisma.job.update({
+    const job = await this.prisma.job.findFirst({
+      where: {
+        id: jobId,
+        postedById: userId,
+      },
+    });
+
+    if (!job) {
+      throw new NotFoundException(
+        'Job not found or you are not the job poster',
+      );
+    }
+
+    // Verify that the application exists
+    const application = await this.prisma.application.findFirst({
+      where: {
+        jobId,
+        applicantId,
+      },
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    // Update the job with the selected applicant
+    const updatedJob = await this.prisma.job.update({
       where: { id: jobId },
       data: { filledById: applicantId },
     });
+
+    // Create a chat between the job poster and the selected applicant
+    await this.chatService.create({
+      participantIds: [userId, applicantId],
+      jobId,
+    });
+
+    return updatedJob;
   }
 }
