@@ -31,7 +31,10 @@ let ChatController = class ChatController {
         return this.chatService.findAll(req.user.id);
     }
     findOne(id, req) {
-        return this.chatService.findOne(+id, req.user.id);
+        return this.chatService.findOne(id, req.user.id);
+    }
+    findOneByJob(jobId, req) {
+        return this.chatService.findOneByJob(jobId, req.user.id);
     }
     sendMessage(sendMessageDto, req) {
         return this.chatService.sendMessage(sendMessageDto, req.user.id);
@@ -64,12 +67,21 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", void 0)
 ], ChatController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('jobs/:jobId'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, common_1.Param)('jobId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ChatController.prototype, "findOneByJob", null);
 __decorate([
     (0, common_1.Post)('message'),
     __param(0, (0, common_1.Body)()),

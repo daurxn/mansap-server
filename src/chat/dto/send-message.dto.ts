@@ -7,4 +7,4 @@ export class SendMessageDto {
   @IsNotEmpty()
   @IsString()
   content: string;
-} 
+}

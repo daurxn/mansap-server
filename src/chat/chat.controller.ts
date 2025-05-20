@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -33,8 +34,20 @@ export class ChatController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
-    return this.chatService.findOne(+id, req.user.id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.chatService.findOne(id, req.user.id);
+  }
+
+  @Get('jobs/:jobId')
+  @UseGuards(AuthGuard)
+  findOneByJob(
+    @Param('jobId', ParseIntPipe) jobId: number,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.chatService.findOneByJob(jobId, req.user.id);
   }
 
   @Post('message')

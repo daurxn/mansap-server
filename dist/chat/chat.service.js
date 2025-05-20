@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
 const client_1 = require("@prisma/client");
+const prisma_service_1 = require("../prisma/prisma.service");
 let ChatService = class ChatService {
     prisma;
     constructor(prisma) {
@@ -90,6 +90,42 @@ let ChatService = class ChatService {
                 messages: {
                     orderBy: {
                         createdAt: 'asc',
+                    },
+                },
+            },
+        });
+        if (!chat) {
+            throw new common_1.NotFoundException('Chat not found or you are not a participant');
+        }
+        return chat;
+    }
+    async findOneByJob(jobId, userId) {
+        const chat = await this.prisma.chat.findFirst({
+            where: {
+                jobId,
+                participants: {
+                    some: {
+                        userId,
+                    },
+                },
+            },
+            include: {
+                participants: {
+                    include: {
+                        user: true,
+                    },
+                },
+                job: true,
+                messages: {
+                    orderBy: {
+                        createdAt: 'asc',
+                    },
+                    include: {
+                        sender: {
+                            select: {
+                                name: true,
+                            },
+                        },
                     },
                 },
             },

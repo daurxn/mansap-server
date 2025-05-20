@@ -2,13 +2,12 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
+import { MessageStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { UpdateMessageStatusDto } from './dto/update-message-status.dto';
-import { MessageStatus } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
@@ -91,6 +90,47 @@ export class ChatService {
         messages: {
           orderBy: {
             createdAt: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException(
+        'Chat not found or you are not a participant',
+      );
+    }
+
+    return chat;
+  }
+
+  async findOneByJob(jobId: number, userId: number) {
+    const chat = await this.prisma.chat.findFirst({
+      where: {
+        jobId,
+        participants: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+        job: true,
+        messages: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+          include: {
+            sender: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },

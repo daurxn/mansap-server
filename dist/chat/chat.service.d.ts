@@ -7,10 +7,11 @@ export declare class ChatService {
     constructor(prisma: PrismaService);
     create(createChatDto: CreateChatDto): Promise<{
         job: {
+            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            locationId: number | null;
             description: string;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
@@ -18,24 +19,23 @@ export declare class ChatService {
             jobType: import(".prisma/client").$Enums.JobType;
             postedById: number;
             filledById: number | null;
-            locationId: number | null;
         } | null;
         participants: ({
             user: {
+                email: string;
+                password: string;
+                name: string;
+                role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                email: string;
-                password: string;
-                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             id: number;
+            chatId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
             userId: number;
-            chatId: number;
         })[];
     } & {
         id: number;
@@ -45,10 +45,11 @@ export declare class ChatService {
     }>;
     findAll(userId: number): Promise<({
         job: {
+            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            locationId: number | null;
             description: string;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
@@ -56,24 +57,23 @@ export declare class ChatService {
             jobType: import(".prisma/client").$Enums.JobType;
             postedById: number;
             filledById: number | null;
-            locationId: number | null;
         } | null;
         participants: ({
             user: {
+                email: string;
+                password: string;
+                name: string;
+                role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                email: string;
-                password: string;
-                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             id: number;
+            chatId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
             userId: number;
-            chatId: number;
         })[];
         messages: {
             id: number;
@@ -92,10 +92,11 @@ export declare class ChatService {
     })[]>;
     findOne(id: number, userId: number): Promise<{
         job: {
+            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            locationId: number | null;
             description: string;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
@@ -103,24 +104,23 @@ export declare class ChatService {
             jobType: import(".prisma/client").$Enums.JobType;
             postedById: number;
             filledById: number | null;
-            locationId: number | null;
         } | null;
         participants: ({
             user: {
+                email: string;
+                password: string;
+                name: string;
+                role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
-                email: string;
-                password: string;
-                role: import(".prisma/client").$Enums.Role;
             };
         } & {
             id: number;
+            chatId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
             userId: number;
-            chatId: number;
         })[];
         messages: {
             id: number;
@@ -137,15 +137,66 @@ export declare class ChatService {
         updatedAt: Date;
         jobId: number | null;
     }>;
-    sendMessage(sendMessageDto: SendMessageDto, senderId: number): Promise<{
-        sender: {
+    findOneByJob(jobId: number, userId: number): Promise<{
+        job: {
+            name: string;
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
+            locationId: number | null;
+            description: string;
+            salary: import("@prisma/client/runtime/library").Decimal;
+            unit: import(".prisma/client").$Enums.Unit;
+            experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
+            jobType: import(".prisma/client").$Enums.JobType;
+            postedById: number;
+            filledById: number | null;
+        } | null;
+        participants: ({
+            user: {
+                email: string;
+                password: string;
+                name: string;
+                role: import(".prisma/client").$Enums.Role;
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+            };
+        } & {
+            id: number;
+            chatId: number;
+            joinedAt: Date;
+            lastReadAt: Date | null;
+            userId: number;
+        })[];
+        messages: ({
+            sender: {
+                name: string;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            chatId: number;
+            content: string;
+            status: import(".prisma/client").$Enums.MessageStatus;
+            senderId: number;
+        })[];
+    } & {
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        jobId: number | null;
+    }>;
+    sendMessage(sendMessageDto: SendMessageDto, senderId: number): Promise<{
+        sender: {
             email: string;
             password: string;
+            name: string;
             role: import(".prisma/client").$Enums.Role;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
         };
     } & {
         id: number;
@@ -167,10 +218,10 @@ export declare class ChatService {
     }>;
     markChatAsRead(chatId: number, userId: number): Promise<{
         id: number;
+        chatId: number;
         joinedAt: Date;
         lastReadAt: Date | null;
         userId: number;
-        chatId: number;
     }>;
     remove(id: number): Promise<{
         id: number;
