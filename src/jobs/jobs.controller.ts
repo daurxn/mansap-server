@@ -11,14 +11,14 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { Role } from 'src/auth/enums/role.enum';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { RoleGuard } from 'src/auth/guards/role.guard';
-import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../decorators/roles.decorator';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { JobsService } from './jobs.service';
-import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
+import { AuthenticatedRequest } from '../auth/interfaces/authenticated-request.interface';
 import { CreateApplicationDto } from './dto/create-application.dto';
 
 @Controller('jobs')

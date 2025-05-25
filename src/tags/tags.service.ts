@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTagDto } from './dto/create-tag.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TagsService {

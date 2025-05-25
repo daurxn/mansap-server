@@ -9,9 +9,9 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { RoleGuard } from 'src/auth/guards/role.guard';
-import { Roles } from 'src/decorators/roles.decorator';
-import { Role } from 'src/auth/enums/role.enum';
+import { RoleGuard } from './guards/role.guard';
+import { Roles } from '../decorators/roles.decorator';
+import { Role } from './enums/role.enum';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthenticatedRequest } from './interfaces/authenticated-request.interface';
 
