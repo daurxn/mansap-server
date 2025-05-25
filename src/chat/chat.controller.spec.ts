@@ -10,7 +10,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 describe('ChatController', () => {
   let controller: ChatController;
-  let chatService: ChatService;
 
   // Mock data
   const mockUser = {
@@ -71,7 +70,6 @@ describe('ChatController', () => {
       .compile();
 
     controller = module.get<ChatController>(ChatController);
-    chatService = module.get<ChatService>(ChatService);
 
     // Reset all mocks
     jest.clearAllMocks();
@@ -126,19 +124,32 @@ describe('ChatController', () => {
 
       const result = await controller.findOneByJob(jobId, mockRequest);
 
-      expect(mockChatService.findOneByJob).toHaveBeenCalledWith(jobId, mockUser.id);
+      expect(mockChatService.findOneByJob).toHaveBeenCalledWith(
+        jobId,
+        mockUser.id,
+      );
       expect(result).toEqual(expectedResult);
     });
   });
 
   describe('sendMessage', () => {
     it('should call chatService.sendMessage with the message data and user id', async () => {
-      const expectedResult = { id: 1, ...mockSendMessageDto, senderId: mockUser.id };
+      const expectedResult = {
+        id: 1,
+        ...mockSendMessageDto,
+        senderId: mockUser.id,
+      };
       mockChatService.sendMessage.mockResolvedValue(expectedResult);
 
-      const result = await controller.sendMessage(mockSendMessageDto, mockRequest);
+      const result = await controller.sendMessage(
+        mockSendMessageDto,
+        mockRequest,
+      );
 
-      expect(mockChatService.sendMessage).toHaveBeenCalledWith(mockSendMessageDto, mockUser.id);
+      expect(mockChatService.sendMessage).toHaveBeenCalledWith(
+        mockSendMessageDto,
+        mockUser.id,
+      );
       expect(result).toEqual(expectedResult);
     });
   });
@@ -146,12 +157,23 @@ describe('ChatController', () => {
   describe('updateMessageStatus', () => {
     it('should call chatService.updateMessageStatus with the message id, user id, and status data', async () => {
       const messageId = '1';
-      const expectedResult = { id: 1, status: mockUpdateMessageStatusDto.status };
+      const expectedResult = {
+        id: 1,
+        status: mockUpdateMessageStatusDto.status,
+      };
       mockChatService.updateMessageStatus.mockResolvedValue(expectedResult);
 
-      const result = await controller.updateMessageStatus(messageId, mockUpdateMessageStatusDto, mockRequest);
+      const result = await controller.updateMessageStatus(
+        messageId,
+        mockUpdateMessageStatusDto,
+        mockRequest,
+      );
 
-      expect(mockChatService.updateMessageStatus).toHaveBeenCalledWith(+messageId, mockUser.id, mockUpdateMessageStatusDto);
+      expect(mockChatService.updateMessageStatus).toHaveBeenCalledWith(
+        +messageId,
+        mockUser.id,
+        mockUpdateMessageStatusDto,
+      );
       expect(result).toEqual(expectedResult);
     });
   });
@@ -164,7 +186,10 @@ describe('ChatController', () => {
 
       const result = await controller.markChatAsRead(chatId, mockRequest);
 
-      expect(mockChatService.markChatAsRead).toHaveBeenCalledWith(+chatId, mockUser.id);
+      expect(mockChatService.markChatAsRead).toHaveBeenCalledWith(
+        +chatId,
+        mockUser.id,
+      );
       expect(result).toEqual(expectedResult);
     });
   });
@@ -175,7 +200,7 @@ describe('ChatController', () => {
       const expectedResult = { success: true };
       mockChatService.remove.mockResolvedValue(expectedResult);
 
-      const result = await controller.remove(chatId, mockRequest);
+      const result = await controller.remove(chatId);
 
       expect(mockChatService.remove).toHaveBeenCalledWith(+chatId);
       expect(result).toEqual(expectedResult);

@@ -8,10 +8,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: 'https://mansap.vercel.app', 
-    methods: 'GET,POST,PUT,DELETE', 
+    origin: 'https://mansap.vercel.app',
+    methods: 'GET,POST,PUT,DELETE',
     credentials: true,
-    allowedHeaders: 'Content-Type, Authorization', 
+    allowedHeaders: 'Content-Type, Authorization',
   });
 
   const config = new DocumentBuilder()
@@ -26,4 +26,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3001);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Error during bootstrap:', error);
+  process.exit(1);
+});

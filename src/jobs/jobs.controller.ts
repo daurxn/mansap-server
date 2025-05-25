@@ -63,7 +63,6 @@ export class JobsController {
   @Get('applications')
   @UseGuards(AuthGuard)
   getApplications(@Request() req: AuthenticatedRequest) {
-    console.log('test');
     return this.jobsService.getApplications(req.user.id);
   }
 

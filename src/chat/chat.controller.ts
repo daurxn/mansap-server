@@ -76,7 +76,7 @@ export class ChatController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  remove(@Param('id') id: string) {
     return this.chatService.remove(+id);
   }
 }

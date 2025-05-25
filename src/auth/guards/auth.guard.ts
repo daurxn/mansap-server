@@ -11,11 +11,12 @@ export class AuthGuard extends AuthGuardPassport('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err, user) {
+  handleRequest(err: any, user: any): any {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }
 
+    // Safe to return the user after validation
     return user;
   }
 }
