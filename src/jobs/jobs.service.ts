@@ -106,7 +106,7 @@ export class JobsService {
   }
 
   async findOne(userId: number, id: number) {
-    const job = await this.prisma.job.findFirst({
+    const job = await this.prisma.job.findUnique({
       where: { id: id },
       include: {
         postedBy: { select: { email: true, name: true, id: true } },
@@ -115,11 +115,12 @@ export class JobsService {
       },
     });
 
-    const jobs = await this.prisma.application.findMany({
+    const applications = await this.prisma.application.findMany({
+      where: { applicantId: userId },
       select: { job: { select: { id: true } } },
     });
 
-    const applied = job && jobs.some((j) => j.job.id === job.id);
+    const applied = job && applications.some((app) => app.job.id === job.id);
 
     const is_applicable = job?.postedById !== userId;
 

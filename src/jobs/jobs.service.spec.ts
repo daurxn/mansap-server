@@ -203,16 +203,14 @@ describe('JobsService', () => {
         postedById: 3,
       };
 
-      mockPrismaService.job.findFirst.mockResolvedValue(job);
+      mockPrismaService.job.findUnique.mockResolvedValue(job);
       mockPrismaService.application.findMany.mockResolvedValue([]);
 
       // Act
-      const result = await service.findAll(userId);
+      const result = await service.findOne(userId, jobId);
 
       // Assert
-      expect(result).toEqual([
-        { ...jobs[0], applied: true, is_applicable: true },
-      ]);
+      expect(result).toEqual({ ...job, applied: false, is_applicable: true });
     });
 
     it('should mark jobs as not applicable when user is the poster', async () => {
