@@ -106,34 +106,24 @@ export class JobsService {
   }
 
   async findOne(userId: number, id: number) {
-    const job = await this.prisma.job.findUnique({
-      where: { id },
+    const job = await this.prisma.job.findFirst({
+      where: { id: id },
       include: {
         postedBy: { select: { email: true, name: true, id: true } },
         tags: { select: { name: true } },
-        applications: {
-          include: { applicant: true, resume: true },
-        },
+        applications: { include: { applicant: true, resume: true } },
       },
     });
 
-    if (!job) {
-      throw new NotFoundException(`Job with ID ${id} not found`);
-    }
-
-    const application = await this.prisma.application.findFirst({
-      where: {
-        jobId: id,
-        applicantId: userId,
-      },
-      select: { id: true }, // Only need to check for existence
+    const jobs = await this.prisma.application.findMany({
+      select: { job: { select: { id: true } } },
     });
 
-    return {
-      ...job,
-      is_applicable: job.postedById !== userId,
-      applied: !!application,
-    };
+    const applied = job && jobs.some((j) => j.job.id === job.id);
+
+    const is_applicable = job?.postedById !== userId;
+
+    return { ...job, is_applicable, applied };
   }
 
   update(id: number, updateJobDto: UpdateJobDto) {
@@ -164,6 +154,8 @@ export class JobsService {
       where: { id: applicantId },
     });
 
+    console.log(applicant, jobId, coverLetter);
+
     if (!applicant) {
       throw new NotFoundException(
         `Applicant with ID ${applicantId} not found.`,
@@ -178,6 +170,8 @@ export class JobsService {
       throw new NotFoundException(`Job with ID ${jobId} not found.`);
     }
 
+    console.log(1);
+
     const existingApplication = await this.prisma.application.findFirst({
       where: {
         applicantId: applicantId,
@@ -191,11 +185,15 @@ export class JobsService {
       );
     }
 
+    console.log(2);
+
     const resume = await this.prisma.resume.findUnique({
       where: { userId: applicantId },
     });
 
     if (resume) {
+      console.log(resume, job, applicant);
+
       try {
         const newApplication = await this.prisma.application.create({
           data: {
