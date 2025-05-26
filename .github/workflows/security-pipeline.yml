@@ -100,6 +100,9 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
+      
+      - name: Create coverage summary file
+        run: cp coverage/coverage-final.json coverage/coverage-summary.json
           
       - name: Check coverage thresholds
         run: |
