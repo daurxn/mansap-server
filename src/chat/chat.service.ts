@@ -91,6 +91,13 @@ export class ChatService {
           orderBy: {
             createdAt: 'asc',
           },
+          include: {
+            sender: {
+              select: {
+                name: true,
+              },
+            },
+          },
         },
       },
     });
@@ -146,7 +153,12 @@ export class ChatService {
   }
 
   async sendMessage(sendMessageDto: SendMessageDto, senderId: number) {
-    const { chatId, content } = sendMessageDto;
+    const { chatId, content, imageUrl } = sendMessageDto;
+
+    // Debug logging
+    console.log('SendMessageDto received:', sendMessageDto);
+    console.log('Extracted imageUrl:', imageUrl);
+    console.log('imageUrl type:', typeof imageUrl);
 
     // Verify chat exists and user is a participant
     const chat = await this.prisma.chat.findFirst({
@@ -167,9 +179,18 @@ export class ChatService {
     }
 
     // Create message
+    console.log('Creating message with data:', {
+      content,
+      imageUrl,
+      chatId,
+      senderId,
+      status: MessageStatus.SENT,
+    });
+
     const message = await this.prisma.message.create({
       data: {
         content,
+        imageUrl,
         chatId,
         senderId,
         status: MessageStatus.SENT,
@@ -178,6 +199,8 @@ export class ChatService {
         sender: true,
       },
     });
+
+    console.log('Created message:', message);
 
     // Update chat's updatedAt timestamp
     await this.prisma.chat.update({

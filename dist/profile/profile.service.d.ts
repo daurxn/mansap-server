@@ -42,10 +42,10 @@ export declare class ProfileService {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
-        title: string;
         description: string;
         imageUrl: string | null;
+        userId: number;
+        title: string;
         projectUrl: string | null;
     }>;
     getProjects(userId: number): Promise<{
@@ -53,10 +53,10 @@ export declare class ProfileService {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            userId: number;
-            title: string;
             description: string;
             imageUrl: string | null;
+            userId: number;
+            title: string;
             projectUrl: string | null;
         }[];
         message: string;
@@ -65,10 +65,10 @@ export declare class ProfileService {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
-        title: string;
         description: string;
         imageUrl: string | null;
+        userId: number;
+        title: string;
         projectUrl: string | null;
     }>;
     deleteProject(userId: number, projectId: number): Promise<{

@@ -91,6 +91,13 @@ let ChatService = class ChatService {
                     orderBy: {
                         createdAt: 'asc',
                     },
+                    include: {
+                        sender: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
                 },
             },
         });
@@ -136,7 +143,10 @@ let ChatService = class ChatService {
         return chat;
     }
     async sendMessage(sendMessageDto, senderId) {
-        const { chatId, content } = sendMessageDto;
+        const { chatId, content, imageUrl } = sendMessageDto;
+        console.log('SendMessageDto received:', sendMessageDto);
+        console.log('Extracted imageUrl:', imageUrl);
+        console.log('imageUrl type:', typeof imageUrl);
         const chat = await this.prisma.chat.findFirst({
             where: {
                 id: chatId,
@@ -150,9 +160,17 @@ let ChatService = class ChatService {
         if (!chat) {
             throw new common_1.NotFoundException('Chat not found or user is not a participant');
         }
+        console.log('Creating message with data:', {
+            content,
+            imageUrl,
+            chatId,
+            senderId,
+            status: client_1.MessageStatus.SENT,
+        });
         const message = await this.prisma.message.create({
             data: {
                 content,
+                imageUrl,
                 chatId,
                 senderId,
                 status: client_1.MessageStatus.SENT,
@@ -161,6 +179,7 @@ let ChatService = class ChatService {
                 sender: true,
             },
         });
+        console.log('Created message:', message);
         await this.prisma.chat.update({
             where: { id: chatId },
             data: { updatedAt: new Date() },

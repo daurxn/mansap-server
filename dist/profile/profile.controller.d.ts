@@ -43,10 +43,10 @@ export declare class ProfileController {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
-        title: string;
         description: string;
         imageUrl: string | null;
+        userId: number;
+        title: string;
         projectUrl: string | null;
     }>;
     getProjects(req: AuthenticatedRequest): Promise<{
@@ -54,10 +54,10 @@ export declare class ProfileController {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            userId: number;
-            title: string;
             description: string;
             imageUrl: string | null;
+            userId: number;
+            title: string;
             projectUrl: string | null;
         }[];
         message: string;
@@ -66,10 +66,10 @@ export declare class ProfileController {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        userId: number;
-        title: string;
         description: string;
         imageUrl: string | null;
+        userId: number;
+        title: string;
         projectUrl: string | null;
     }>;
     deleteProject(id: number, req: AuthenticatedRequest): Promise<{

@@ -91,6 +91,7 @@ export declare class ChatService {
             updatedAt: Date;
             chatId: number;
             content: string;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
             senderId: number;
         }[];
@@ -137,15 +138,20 @@ export declare class ChatService {
             lastReadAt: Date | null;
             userId: number;
         })[];
-        messages: {
+        messages: ({
+            sender: {
+                name: string;
+            };
+        } & {
             id: number;
             createdAt: Date;
             updatedAt: Date;
             chatId: number;
             content: string;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
             senderId: number;
-        }[];
+        })[];
     } & {
         id: number;
         createdAt: Date;
@@ -199,6 +205,7 @@ export declare class ChatService {
             updatedAt: Date;
             chatId: number;
             content: string;
+            imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
             senderId: number;
         })[];
@@ -224,6 +231,7 @@ export declare class ChatService {
         updatedAt: Date;
         chatId: number;
         content: string;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
         senderId: number;
     }>;
@@ -233,6 +241,7 @@ export declare class ChatService {
         updatedAt: Date;
         chatId: number;
         content: string;
+        imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
         senderId: number;
     }>;
