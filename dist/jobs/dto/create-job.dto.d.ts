@@ -8,4 +8,9 @@ export declare class CreateJobDto {
     jobType: JobType;
     locationId?: number;
     tags?: string[];
+    requirements?: string;
+    responsibilities?: string;
+    applicationDeadline?: string;
+    isRemote?: boolean;
+    companyInfo?: string;
 }

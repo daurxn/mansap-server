@@ -18,6 +18,8 @@ const auth_guard_1 = require("../auth/guards/auth.guard");
 const update_profile_dto_1 = require("./dto/update-profile.dto");
 const profile_service_1 = require("./profile.service");
 const create_resume_dto_1 = require("./dto/create-resume.dto");
+const create_project_dto_1 = require("./dto/create-project.dto");
+const update_project_dto_1 = require("./dto/update-project.dto");
 let ProfileController = class ProfileController {
     profileService;
     constructor(profileService) {
@@ -34,6 +36,18 @@ let ProfileController = class ProfileController {
     }
     getResume(req) {
         return this.profileService.getResume(req.user.id);
+    }
+    createProject(createProjectDto, req) {
+        return this.profileService.createProject(req.user.id, createProjectDto);
+    }
+    getProjects(req) {
+        return this.profileService.getProjects(req.user.id);
+    }
+    updateProject(id, updateProjectDto, req) {
+        return this.profileService.updateProject(req.user.id, id, updateProjectDto);
+    }
+    deleteProject(id, req) {
+        return this.profileService.deleteProject(req.user.id, id);
     }
 };
 exports.ProfileController = ProfileController;
@@ -71,6 +85,42 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "getResume", null);
+__decorate([
+    (0, common_1.Post)('projects'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_project_dto_1.CreateProjectDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "createProject", null);
+__decorate([
+    (0, common_1.Get)('projects'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "getProjects", null);
+__decorate([
+    (0, common_1.Patch)('projects/:id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_project_dto_1.UpdateProjectDto, Object]),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "updateProject", null);
+__decorate([
+    (0, common_1.Delete)('projects/:id'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "deleteProject", null);
 exports.ProfileController = ProfileController = __decorate([
     (0, common_1.Controller)('profile'),
     __metadata("design:paramtypes", [profile_service_1.ProfileService])

@@ -1,6 +1,8 @@
 import { ExperienceLevel, JobType, Unit } from '@prisma/client';
 import {
   IsArray,
+  IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
   IsNumber,
@@ -76,4 +78,33 @@ export class UpdateJobDto {
     message: 'Each tag cannot be longer than 50 characters.',
   })
   tags?: string[];
+
+  @IsOptional()
+  @IsString({ message: 'Requirements must be a string.' })
+  @MaxLength(5000, {
+    message: 'Requirements cannot be longer than 5000 characters.',
+  })
+  requirements?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Responsibilities must be a string.' })
+  @MaxLength(5000, {
+    message: 'Responsibilities cannot be longer than 5000 characters.',
+  })
+  responsibilities?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'Application deadline must be a valid date.' })
+  applicationDeadline?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'Remote work option must be a boolean.' })
+  isRemote?: boolean;
+
+  @IsOptional()
+  @IsString({ message: 'Company information must be a string.' })
+  @MaxLength(2000, {
+    message: 'Company information cannot be longer than 2000 characters.',
+  })
+  companyInfo?: string;
 }

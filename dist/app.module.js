@@ -20,6 +20,7 @@ const serve_static_1 = require("@nestjs/serve-static");
 const path = require("path");
 const profile_module_1 = require("./profile/profile.module");
 const chat_module_1 = require("./chat/chat.module");
+const upload_module_1 = require("./upload/upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             locations_module_1.LocationsModule,
             profile_module_1.ProfileModule,
             chat_module_1.ChatModule,
+            upload_module_1.UploadModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

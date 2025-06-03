@@ -18,6 +18,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
@@ -32,6 +37,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     } & {
@@ -65,6 +75,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     })[]>;
@@ -117,6 +132,11 @@ export declare class JobsService {
         unit?: import(".prisma/client").$Enums.Unit | undefined;
         experienceLevel?: import(".prisma/client").$Enums.ExperienceLevel | undefined;
         jobType?: import(".prisma/client").$Enums.JobType | undefined;
+        requirements?: string | null | undefined;
+        responsibilities?: string | null | undefined;
+        applicationDeadline?: Date | null | undefined;
+        isRemote?: boolean | undefined;
+        companyInfo?: string | null | undefined;
         postedById?: number | undefined;
         filledById?: number | null | undefined;
     }>;
@@ -131,6 +151,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
@@ -145,6 +170,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
@@ -160,6 +190,11 @@ export declare class JobsService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         };
@@ -219,6 +254,11 @@ export declare class JobsService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         };
@@ -243,6 +283,11 @@ export declare class JobsService {
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
+        requirements: string | null;
+        responsibilities: string | null;
+        applicationDeadline: Date | null;
+        isRemote: boolean;
+        companyInfo: string | null;
         postedById: number;
         filledById: number | null;
     }>;

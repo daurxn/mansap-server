@@ -17,6 +17,11 @@ export declare class ChatService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         } | null;
@@ -55,6 +60,11 @@ export declare class ChatService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         } | null;
@@ -102,6 +112,11 @@ export declare class ChatService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         } | null;
@@ -149,6 +164,11 @@ export declare class ChatService {
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
+            requirements: string | null;
+            responsibilities: string | null;
+            applicationDeadline: Date | null;
+            isRemote: boolean;
+            companyInfo: string | null;
             postedById: number;
             filledById: number | null;
         } | null;

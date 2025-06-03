@@ -11,6 +11,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 import { ProfileModule } from './profile/profile.module';
 import { ChatModule } from './chat/chat.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ChatModule } from './chat/chat.module';
     LocationsModule,
     ProfileModule,
     ChatModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

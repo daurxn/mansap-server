@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Image Upload Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .chat-container {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 70%;
+    }
+    .sent {
+      background-color: #dcf8c6;
+      margin-left: auto;
+    }
+    .received {
+      background-color: #f1f0f0;
+    }
+    .message-image {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .input-container {
+      display: flex;
+      gap: 10px;
+    }
+    .message-input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .send-button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .upload-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .image-preview {
+      max-width: 100px;
+      max-height: 100px;
+      margin-left: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat with Image Upload</h1>
+  
+  <div class="chat-container" id="chatContainer">
+    <!-- Messages will be displayed here -->
+  </div>
+  
+  <div class="upload-container">
+    <input type="file" id="imageUpload" accept="image/*">
+    <img id="imagePreview" class="image-preview">
+  </div>
+  
+  <div class="input-container">
+    <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
+    <button class="send-button" id="sendButton">Send</button>
+  </div>
+
+  <script>
+    // DOM elements
+    const chatContainer = document.getElementById('chatContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Variables to store chat state
+    let currentChatId = 1; // This would normally come from your backend
+    let currentUserId = 1; // This would normally come from your authentication
+    let uploadedImageUrl = null;
+    
+    // Show image preview when a file is selected
+    imageUpload.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Send message when button is clicked
+    sendButton.addEventListener('click', sendMessage);
+    
+    // Also send message when Enter key is pressed
+    messageInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
+    async function sendMessage() {
+      const content = messageInput.value.trim();
+      const file = imageUpload.files[0];
+      
+      // Validate that either content or image is provided
+      if (!content && !file) {
+        alert('Please enter a message or select an image');
+        return;
+      }
+      
+      try {
+        let imageUrl = null;
+        
+        // If there's an image, upload it first
+        if (file) {
+          imageUrl = await uploadImage(file);
+        }
+        
+        // Then send the message with the image URL
+        await sendChatMessage(content, imageUrl);
+        
+        // Clear inputs
+        messageInput.value = '';
+        imageUpload.value = '';
+        imagePreview.style.display = 'none';
+        uploadedImageUrl = null;
+        
+      } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Failed to send message. Please try again.');
+      }
+    }
+    
+    async function uploadImage(file) {
+      // Create form data for the file upload
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // In a real application, you would send this to your backend
+      // This is a simulation for the example
+      console.log('Uploading image...');
+      
+      // Normally, you would make an API call like this:
+      /*
+      const response = await fetch('/api/upload/chat-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+      
+      const data = await response.json();
+      return data.imageUrl;
+      */
+      
+      // For this example, we'll simulate a successful upload
+      // by returning the data URL
+      return URL.createObjectURL(file);
+    }
+    
+    async function sendChatMessage(content, imageUrl) {
+      // In a real application, you would send this to your backend
+      // This is a simulation for the example
+      console.log('Sending message:', { content, imageUrl });
+      
+      // Normally, you would make an API call like this:
+      /*
+      const response = await fetch('/api/chat/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+        },
+        body: JSON.stringify({
+          chatId: currentChatId,
+          content: content || '',
+          imageUrl
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      
+      const message = await response.json();
+      */
+      
+      // For this example, we'll simulate a successful message send
+      const message = {
+        id: Date.now(),
+        content: content || '',
+        imageUrl,
+        senderId: currentUserId,
+        createdAt: new Date().toISOString()
+      };
+      
+      // Add the message to the chat UI
+      addMessageToChat(message);
+      
+      // Simulate receiving a response
+      setTimeout(() => {
+        const response = {
+          id: Date.now() + 1,
+          content: 'Thanks for your message!',
+          imageUrl: null,
+          senderId: 2, // Another user
+          createdAt: new Date().toISOString()
+        };
+        addMessageToChat(response);
+      }, 1000);
+    }
+    
+    function addMessageToChat(message) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      
+      // Determine if this is a sent or received message
+      if (message.senderId === currentUserId) {
+        messageElement.classList.add('sent');
+      } else {
+        messageElement.classList.add('received');
+      }
+      
+      // Add message content
+      if (message.content) {
+        const contentElement = document.createElement('p');
+        contentElement.textContent = message.content;
+        messageElement.appendChild(contentElement);
+      }
+      
+      // Add image if present
+      if (message.imageUrl) {
+        const imageElement = document.createElement('img');
+        imageElement.src = message.imageUrl;
+        imageElement.classList.add('message-image');
+        imageElement.alt = 'Chat image';
+        messageElement.appendChild(imageElement);
+      }
+      
+      // Add timestamp
+      const timestampElement = document.createElement('small');
+      timestampElement.textContent = new Date(message.createdAt).toLocaleTimeString();
+      timestampElement.style.display = 'block';
+      timestampElement.style.marginTop = '5px';
+      timestampElement.style.color = '#888';
+      messageElement.appendChild(timestampElement);
+      
+      // Add to chat container
+      chatContainer.appendChild(messageElement);
+      
+      // Scroll to the bottom
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  </script>
+</body>
+</html>

@@ -21,6 +21,11 @@ class CreateJobDto {
     jobType;
     locationId;
     tags;
+    requirements;
+    responsibilities;
+    applicationDeadline;
+    isRemote;
+    companyInfo;
 }
 exports.CreateJobDto = CreateJobDto;
 __decorate([
@@ -91,4 +96,38 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], CreateJobDto.prototype, "tags", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Requirements must be a string.' }),
+    (0, class_validator_1.MaxLength)(5000, {
+        message: 'Requirements cannot be longer than 5000 characters.',
+    }),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "requirements", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Responsibilities must be a string.' }),
+    (0, class_validator_1.MaxLength)(5000, {
+        message: 'Responsibilities cannot be longer than 5000 characters.',
+    }),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "responsibilities", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsDateString)({}, { message: 'Application deadline must be a valid date.' }),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "applicationDeadline", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)({ message: 'Remote work option must be a boolean.' }),
+    __metadata("design:type", Boolean)
+], CreateJobDto.prototype, "isRemote", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Company information must be a string.' }),
+    (0, class_validator_1.MaxLength)(2000, {
+        message: 'Company information cannot be longer than 2000 characters.',
+    }),
+    __metadata("design:type", String)
+], CreateJobDto.prototype, "companyInfo", void 0);
 //# sourceMappingURL=create-job.dto.js.map

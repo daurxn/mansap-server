@@ -48,6 +48,7 @@ model User {
   proposals  Proposal[] // Existing proposals model
   profile    Profile?
   resume     Resume? // Relation to the Resume model
+  projects   Project[] // User's portfolio projects
 
   applications Application[] @relation("UserApplications") // User's job applications
 
@@ -81,10 +82,15 @@ model Job {
   id              Int             @id @default(autoincrement())
   name            String
   description     String          @db.Text
+  requirements    String?         @db.Text
+  responsibilities String?        @db.Text
   salary          Decimal         @db.Decimal(10, 2)
   unit            Unit
   experienceLevel ExperienceLevel
   jobType         JobType
+  applicationDeadline DateTime?
+  isRemote        Boolean         @default(false)
+  companyInfo     String?         @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -245,4 +251,21 @@ model Message {
 
   @@index([chatId])
   @@index([senderId])
+}
+
+// Project model for user portfolio
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  imageUrl    String?
+  projectUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // The user who owns this project
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
