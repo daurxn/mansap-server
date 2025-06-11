@@ -60,8 +60,8 @@ export declare class JobsController {
             id: number;
         }[];
         postedBy: {
-            email: string;
             name: string;
+            email: string;
         };
     } & {
         name: string;
@@ -115,9 +115,9 @@ export declare class JobsController {
                 id: number;
             }[];
             postedBy: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -145,11 +145,11 @@ export declare class JobsController {
     } & {
         id: number;
         updatedAt: Date;
-        jobId: number;
-        coverLetter: string | null;
         status: import(".prisma/client").$Enums.ApplicationStatus;
+        jobId: number;
         applicantId: number;
         resumeId: number | null;
+        coverLetter: string | null;
         appliedAt: Date;
     })[]>;
     createApplication(req: AuthenticatedRequest, createApplicationDto: CreateApplicationDto): Promise<({
@@ -181,18 +181,18 @@ export declare class JobsController {
             education: string;
         } | null;
         applicant: {
-            email: string;
             name: string;
+            email: string;
             id: number;
         };
     } & {
         id: number;
         updatedAt: Date;
-        jobId: number;
-        coverLetter: string | null;
         status: import(".prisma/client").$Enums.ApplicationStatus;
+        jobId: number;
         applicantId: number;
         resumeId: number | null;
+        coverLetter: string | null;
         appliedAt: Date;
     }) | undefined>;
     findOne(req: AuthenticatedRequest, id: string): Promise<{
@@ -208,9 +208,9 @@ export declare class JobsController {
                 education: string;
             } | null;
             applicant: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -219,19 +219,19 @@ export declare class JobsController {
         } & {
             id: number;
             updatedAt: Date;
-            jobId: number;
-            coverLetter: string | null;
             status: import(".prisma/client").$Enums.ApplicationStatus;
+            jobId: number;
             applicantId: number;
             resumeId: number | null;
+            coverLetter: string | null;
             appliedAt: Date;
         })[] | undefined;
         tags?: {
             name: string;
         }[] | undefined;
         postedBy?: {
-            email: string;
             name: string;
+            email: string;
             id: number;
         } | undefined;
         name?: string | undefined;

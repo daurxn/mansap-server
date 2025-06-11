@@ -18,6 +18,8 @@ class UpdateProfileDto {
     locationId;
     resume;
     bio;
+    imageUrl;
+    videoUrl;
 }
 exports.UpdateProfileDto = UpdateProfileDto;
 __decorate([
@@ -75,4 +77,26 @@ __decorate([
     (0, class_validator_1.MaxLength)(500, { message: 'Bio cannot exceed 500 characters.' }),
     __metadata("design:type", String)
 ], UpdateProfileDto.prototype, "bio", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: "URL of the user's profile image.",
+        example: 'https://example.com/profile.jpg',
+        maxLength: 500,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Image URL must be a string.' }),
+    (0, class_validator_1.MaxLength)(500, { message: 'Image URL cannot exceed 500 characters.' }),
+    __metadata("design:type", String)
+], UpdateProfileDto.prototype, "imageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: "URL of the user's profile video.",
+        example: 'https://example.com/profile-video.mp4',
+        maxLength: 500,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)({ message: 'Video URL must be a string.' }),
+    (0, class_validator_1.MaxLength)(500, { message: 'Video URL cannot exceed 500 characters.' }),
+    __metadata("design:type", String)
+], UpdateProfileDto.prototype, "videoUrl", void 0);
 //# sourceMappingURL=update-profile.dto.js.map

@@ -28,9 +28,9 @@ export declare class ChatController {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -38,10 +38,10 @@ export declare class ChatController {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
     } & {
         id: number;
@@ -71,9 +71,9 @@ export declare class ChatController {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -81,19 +81,19 @@ export declare class ChatController {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         }[];
     } & {
@@ -124,9 +124,9 @@ export declare class ChatController {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -134,10 +134,10 @@ export declare class ChatController {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: ({
             sender: {
@@ -147,10 +147,10 @@ export declare class ChatController {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         })[];
     } & {
@@ -181,9 +181,9 @@ export declare class ChatController {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -191,10 +191,10 @@ export declare class ChatController {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: ({
             sender: {
@@ -204,10 +204,10 @@ export declare class ChatController {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         })[];
     } & {
@@ -218,9 +218,9 @@ export declare class ChatController {
     }>;
     sendMessage(sendMessageDto: SendMessageDto, req: AuthenticatedRequest): Promise<{
         sender: {
+            name: string;
             email: string;
             password: string;
-            name: string;
             role: import(".prisma/client").$Enums.Role;
             id: number;
             createdAt: Date;
@@ -230,28 +230,28 @@ export declare class ChatController {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        chatId: number;
-        content: string;
         imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
+        chatId: number;
+        content: string;
         senderId: number;
     }>;
     updateMessageStatus(id: string, statusDto: UpdateMessageStatusDto, req: AuthenticatedRequest): Promise<{
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        chatId: number;
-        content: string;
         imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
+        chatId: number;
+        content: string;
         senderId: number;
     }>;
     markChatAsRead(id: string, req: AuthenticatedRequest): Promise<{
         id: number;
-        chatId: number;
+        userId: number;
         joinedAt: Date;
         lastReadAt: Date | null;
-        userId: number;
+        chatId: number;
     }>;
     remove(id: string): Promise<{
         id: number;

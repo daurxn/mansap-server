@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const auth_guard_1 = require("../auth/guards/auth.guard");
 const update_profile_dto_1 = require("./dto/update-profile.dto");
 const profile_service_1 = require("./profile.service");
@@ -25,11 +26,20 @@ let ProfileController = class ProfileController {
     constructor(profileService) {
         this.profileService = profileService;
     }
+    async uploadProfileImage(file, req) {
+        return this.profileService.uploadProfileImage(req.user.id, file);
+    }
+    async uploadProfileVideo(file, req) {
+        return this.profileService.uploadProfileVideo(req.user.id, file);
+    }
     update(updateProfileDto, req) {
         return this.profileService.update(req.user.id, updateProfileDto);
     }
     getProfile(req) {
         return this.profileService.getProfile(req.user.id);
+    }
+    getAllProfiles() {
+        return this.profileService.getAllProfiles();
     }
     createResume(createResumeDto, req) {
         return this.profileService.createResume(req.user.id, createResumeDto);
@@ -43,6 +53,9 @@ let ProfileController = class ProfileController {
     getProjects(req) {
         return this.profileService.getProjects(req.user.id);
     }
+    uploadProjectVideo(projectId, file, req) {
+        return this.profileService.uploadProjectVideo(req.user.id, projectId, file);
+    }
     updateProject(id, updateProjectDto, req) {
         return this.profileService.updateProject(req.user.id, id, updateProjectDto);
     }
@@ -51,6 +64,26 @@ let ProfileController = class ProfileController {
     }
 };
 exports.ProfileController = ProfileController;
+__decorate([
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ProfileController.prototype, "uploadProfileImage", null);
+__decorate([
+    (0, common_1.Post)('upload-video'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ProfileController.prototype, "uploadProfileVideo", null);
 __decorate([
     (0, common_1.Patch)(),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
@@ -68,6 +101,12 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Get)('all'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "getAllProfiles", null);
 __decorate([
     (0, common_1.Post)('resume'),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
@@ -102,6 +141,17 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ProfileController.prototype, "getProjects", null);
+__decorate([
+    (0, common_1.Post)('projects/:id/upload-video'),
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.UploadedFile)()),
+    __param(2, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object, Object]),
+    __metadata("design:returntype", void 0)
+], ProfileController.prototype, "uploadProjectVideo", null);
 __decorate([
     (0, common_1.Patch)('projects/:id'),
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),

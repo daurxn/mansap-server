@@ -9,7 +9,11 @@ import {
   Post,
   Request,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { AuthenticatedRequest } from 'src/auth/interfaces/authenticated-request.interface';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -21,6 +25,26 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 @Controller('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
+  
+  @Post('upload')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.profileService.uploadProfileImage(req.user.id, file);
+  }
+
+  @Post('upload-video')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileVideo(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.profileService.uploadProfileVideo(req.user.id, file);
+  }
 
   @Patch()
   @UseGuards(AuthGuard)
@@ -35,6 +59,11 @@ export class ProfileController {
   @UseGuards(AuthGuard)
   getProfile(@Request() req: AuthenticatedRequest) {
     return this.profileService.getProfile(req.user.id);
+  }
+  
+  @Get('all')
+  getAllProfiles() {
+    return this.profileService.getAllProfiles();
   }
 
   @Post('resume')
@@ -65,6 +94,17 @@ export class ProfileController {
   @UseGuards(AuthGuard)
   getProjects(@Request() req: AuthenticatedRequest) {
     return this.profileService.getProjects(req.user.id);
+  }
+  
+  @Post('projects/:id/upload-video')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  uploadProjectVideo(
+    @Param('id', ParseIntPipe) projectId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.profileService.uploadProjectVideo(req.user.id, projectId, file);
   }
 
   @Patch('projects/:id')

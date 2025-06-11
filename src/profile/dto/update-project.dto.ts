@@ -20,4 +20,8 @@ export class UpdateProjectDto {
   @IsOptional()
   @IsString()
   projectUrl?: string;
+  
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
 }

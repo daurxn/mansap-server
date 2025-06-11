@@ -29,6 +29,79 @@ let UsersService = class UsersService {
             select: { id: true, name: true, email: true, role: true },
         });
     }
+    async getUserProfileById(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID ${userId} not found`);
+        }
+        const profile = await this.prisma.profile.findUnique({
+            where: { userId },
+            select: {
+                id: true,
+                age: true,
+                bio: true,
+                gender: true,
+                locationId: true,
+                imageUrl: true,
+                videoUrl: true,
+            },
+        });
+        if (!profile) {
+            throw new common_1.NotFoundException(`Profile for user ${userId} not found`);
+        }
+        let locationName = null;
+        if (profile.locationId) {
+            const location = await this.prisma.location.findUnique({
+                where: { id: profile.locationId },
+                select: { name: true },
+            });
+            locationName = location ? location.name : null;
+        }
+        return {
+            id: profile.id,
+            userId: user.id,
+            name: user.name,
+            age: profile.age,
+            bio: profile.bio,
+            gender: profile.gender,
+            location: locationName,
+            imageUrl: profile.imageUrl,
+            videoUrl: profile.videoUrl,
+        };
+    }
+    async getUserResumeById(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID ${userId} not found`);
+        }
+        const resume = await this.prisma.resume.findUnique({
+            where: { userId }
+        });
+        return resume
+            ? { data: resume, message: 'Resume found' }
+            : { message: 'No resume available' };
+    }
+    async getUserProjectsById(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID ${userId} not found`);
+        }
+        const projects = await this.prisma.project.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        });
+        return {
+            data: projects,
+            message: projects.length > 0 ? 'Projects found' : 'No projects available',
+        };
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

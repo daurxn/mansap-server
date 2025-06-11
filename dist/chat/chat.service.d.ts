@@ -27,9 +27,9 @@ export declare class ChatService {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -37,10 +37,10 @@ export declare class ChatService {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
     } & {
         id: number;
@@ -70,9 +70,9 @@ export declare class ChatService {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -80,19 +80,19 @@ export declare class ChatService {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         }[];
     } & {
@@ -123,9 +123,9 @@ export declare class ChatService {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -133,10 +133,10 @@ export declare class ChatService {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: ({
             sender: {
@@ -146,10 +146,10 @@ export declare class ChatService {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         })[];
     } & {
@@ -180,9 +180,9 @@ export declare class ChatService {
         } | null;
         participants: ({
             user: {
+                name: string;
                 email: string;
                 password: string;
-                name: string;
                 role: import(".prisma/client").$Enums.Role;
                 id: number;
                 createdAt: Date;
@@ -190,10 +190,10 @@ export declare class ChatService {
             };
         } & {
             id: number;
-            chatId: number;
+            userId: number;
             joinedAt: Date;
             lastReadAt: Date | null;
-            userId: number;
+            chatId: number;
         })[];
         messages: ({
             sender: {
@@ -203,10 +203,10 @@ export declare class ChatService {
             id: number;
             createdAt: Date;
             updatedAt: Date;
-            chatId: number;
-            content: string;
             imageUrl: string | null;
             status: import(".prisma/client").$Enums.MessageStatus;
+            chatId: number;
+            content: string;
             senderId: number;
         })[];
     } & {
@@ -217,9 +217,9 @@ export declare class ChatService {
     }>;
     sendMessage(sendMessageDto: SendMessageDto, senderId: number): Promise<{
         sender: {
+            name: string;
             email: string;
             password: string;
-            name: string;
             role: import(".prisma/client").$Enums.Role;
             id: number;
             createdAt: Date;
@@ -229,28 +229,28 @@ export declare class ChatService {
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        chatId: number;
-        content: string;
         imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
+        chatId: number;
+        content: string;
         senderId: number;
     }>;
     updateMessageStatus(messageId: number, userId: number, statusDto: UpdateMessageStatusDto): Promise<{
         id: number;
         createdAt: Date;
         updatedAt: Date;
-        chatId: number;
-        content: string;
         imageUrl: string | null;
         status: import(".prisma/client").$Enums.MessageStatus;
+        chatId: number;
+        content: string;
         senderId: number;
     }>;
     markChatAsRead(chatId: number, userId: number): Promise<{
         id: number;
-        chatId: number;
+        userId: number;
         joinedAt: Date;
         lastReadAt: Date | null;
-        userId: number;
+        chatId: number;
     }>;
     remove(id: number): Promise<{
         id: number;

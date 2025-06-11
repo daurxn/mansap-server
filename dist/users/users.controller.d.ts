@@ -1,18 +1,8 @@
-import { PrismaService } from '../prisma/prisma.service';
-export declare class UsersService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    findOne(email: string): import(".prisma/client").Prisma.Prisma__UserClient<{
-        name: string;
-        email: string;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
-    findById(id: number): import(".prisma/client").Prisma.Prisma__UserClient<{
-        name: string;
-        email: string;
-        role: import(".prisma/client").$Enums.Role;
-        id: number;
-    } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
-    getUserProfileById(userId: number): Promise<{
+import { UsersService } from './users.service';
+export declare class UsersController {
+    private readonly usersService;
+    constructor(usersService: UsersService);
+    getUserProfile(userId: number): Promise<{
         id: number;
         userId: number;
         name: string;
@@ -23,7 +13,7 @@ export declare class UsersService {
         imageUrl: string | null;
         videoUrl: string | null;
     }>;
-    getUserResumeById(userId: number): Promise<{
+    getUserResume(userId: number): Promise<{
         data: {
             id: number;
             createdAt: Date;
@@ -37,7 +27,7 @@ export declare class UsersService {
         message: string;
         data?: undefined;
     }>;
-    getUserProjectsById(userId: number): Promise<{
+    getUserProjects(userId: number): Promise<{
         data: {
             id: number;
             createdAt: Date;

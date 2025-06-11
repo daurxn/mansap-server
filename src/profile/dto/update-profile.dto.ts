@@ -59,4 +59,24 @@ export class UpdateProfileDto {
   @IsString({ message: 'Bio must be a string.' })
   @MaxLength(500, { message: 'Bio cannot exceed 500 characters.' })
   bio?: string;
+
+  @ApiPropertyOptional({
+    description: "URL of the user's profile image.",
+    example: 'https://example.com/profile.jpg',
+    maxLength: 500,
+  })
+  @IsOptional()
+  @IsString({ message: 'Image URL must be a string.' })
+  @MaxLength(500, { message: 'Image URL cannot exceed 500 characters.' })
+  imageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: "URL of the user's profile video.",
+    example: 'https://example.com/profile-video.mp4',
+    maxLength: 500,
+  })
+  @IsOptional()
+  @IsString({ message: 'Video URL must be a string.' })
+  @MaxLength(500, { message: 'Video URL cannot exceed 500 characters.' })
+  videoUrl?: string;
 }

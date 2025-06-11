@@ -17,6 +17,7 @@ class CreateProjectDto {
     description;
     imageUrl;
     projectUrl;
+    videoUrl;
 }
 exports.CreateProjectDto = CreateProjectDto;
 __decorate([
@@ -43,4 +44,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateProjectDto.prototype, "projectUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'URL to project video', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateProjectDto.prototype, "videoUrl", void 0);
 //# sourceMappingURL=create-project.dto.js.map

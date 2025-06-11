@@ -3,6 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { promises as fs } from 'fs';
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { Express } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CreateResumeDto } from './dto/create-resume.dto';
@@ -11,9 +15,80 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async update(userId: number, updateProfileDto: UpdateProfileDto) {
+  async uploadProfileImage(userId: number, file: Express.Multer.File): Promise<{ imageUrl: string }> {
+    try {
+      if (!file || !file.originalname || !file.buffer) {
+        throw new Error('Invalid file upload');
+      }
+      // Generate a unique filename
+      const fileExtension = path.extname(file.originalname);
+      const fileName = `${uuidv4()}${fileExtension}`;
+
+      // Define upload directory and create it if it doesn't exist
+      const uploadDir = path.resolve('./uploads');
+      await fs.mkdir(uploadDir, { recursive: true });
+
+      // Save the file
+      const filePath = path.join(uploadDir, fileName);
+      await fs.writeFile(filePath, file.buffer);
+
+      // Generate a URL for the image
+      // In production, this would be a CDN or cloud storage URL
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
+      const imageUrl = `${baseUrl}/uploads/${fileName}`;
+
+      return { imageUrl };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw new Error('Failed to upload profile image');
+    }
+  }
+
+  async uploadProfileVideo(userId: number, file: Express.Multer.File): Promise<{ videoUrl: string }> {
+    try {
+      if (!file || !file.originalname || !file.buffer) {
+        throw new Error('Invalid file upload');
+      }
+      
+      // Validate that the file is a video
+      const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+      if (!validVideoTypes.includes(file.mimetype)) {
+        throw new Error('Invalid video format. Supported formats are MP4, WebM, and OGG.');
+      }
+      
+      // Generate a unique filename
+      const fileExtension = path.extname(file.originalname);
+      const fileName = `video-${uuidv4()}${fileExtension}`;
+
+      // Define upload directory and create it if it doesn't exist
+      const uploadDir = path.resolve('./uploads');
+      await fs.mkdir(uploadDir, { recursive: true });
+
+      // Save the file
+      const filePath = path.join(uploadDir, fileName);
+      await fs.writeFile(filePath, file.buffer);
+
+      // Generate a URL for the video
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
+      const videoUrl = `${baseUrl}/uploads/${fileName}`;
+
+      // Update the user's profile with the video URL
+      await this.prisma.profile.update({
+        where: { userId },
+        data: { videoUrl },
+      });
+
+      return { videoUrl };
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      throw new Error(error.message || 'Failed to upload profile video');
+    }
+  }
+
+  async update(userId: number, updateProfileDto: UpdateProfileDto): Promise<{ message: string }> {
+    // Now we can directly use the imageUrl and videoUrl fields from updateProfileDto
     await this.prisma.profile.update({
       where: { userId },
       data: updateProfileDto,
@@ -22,35 +97,112 @@ export class ProfileService {
     return { message: 'Profile has been updated successfully' };
   }
 
-  async getProfile(userId: number) {
+  async getProfile(userId: number): Promise<{
+    name: string | null;
+    age: number | null;
+    bio: string | null;
+    gender: string | null;
+    location: string | null;
+    imageUrl: string | null;
+  }> {
     // First get the profile data
-    const profile = await this.prisma.profile.findFirst({
+    const profile = await this.prisma.profile.findUnique({
       where: { userId },
       select: {
         age: true,
         bio: true,
         gender: true,
-        location: { select: { name: true } }, // Select the name from the related location
+        locationId: true,
+        imageUrl: true,
       },
     });
 
-    // Get the user's name
+    if (!profile) {
+      throw new NotFoundException(`Profile for user ${userId} not found`);
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { name: true },
     });
 
-    // Combine the data and transform location
+    let locationName: string | null = null;
+    if (profile.locationId) {
+      const location = await this.prisma.location.findUnique({
+        where: { id: profile.locationId },
+        select: { name: true },
+      });
+      locationName = location ? location.name : null;
+    }
+
     return {
-      name: user?.name, // User's name
-      age: profile?.age,
-      bio: profile?.bio,
-      gender: profile?.gender,
-      location: profile?.location?.name, // Extract location name string
+      name: user?.name || null, // User's name
+      age: profile.age,
+      bio: profile.bio,
+      gender: profile.gender,
+      location: locationName,
+      imageUrl: profile.imageUrl,
     };
   }
 
-  async createResume(userId: number, createResumeDto: CreateResumeDto) {
+  async getAllProfiles(): Promise<{
+    id: number;
+    userId: number;
+    name: string;
+    age: number | null;
+    bio: string | null;
+    gender: string | null;
+    location: string | null;
+    imageUrl: string | null;
+  }[]> {
+    // Fetch all profiles with their associated users
+    const profiles = await this.prisma.profile.findMany({
+      select: {
+        id: true,
+        age: true,
+        bio: true,
+        gender: true,
+        locationId: true,
+        imageUrl: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    // Fetch locations for profiles with locationId
+    const profilesWithLocation = await Promise.all(
+      profiles.map(async (profile) => {
+        let locationName: string | null = null;
+        if (profile.locationId) {
+          const location = await this.prisma.location.findUnique({
+            where: { id: profile.locationId },
+            select: { name: true },
+          });
+          locationName = location ? location.name : null;
+        }
+
+        return {
+          id: profile.id,
+          userId: profile.user.id,
+          name: profile.user.name,
+          age: profile.age,
+          bio: profile.bio,
+          gender: profile.gender,
+          location: locationName,
+          imageUrl: profile.imageUrl,
+        };
+      }),
+    );
+
+    return profilesWithLocation;
+  }
+
+  async createResume(userId: number, createResumeDto: CreateResumeDto): Promise<{ id: number; userId: number; workExperience: string; education: string }> {
     // 1. Verify the user exists (optional, AuthGuard might make this redundant but good for service integrity)
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -123,7 +275,13 @@ export class ProfileService {
     };
   }
 
-  async updateProject(
+  public async getProject(userId: number, projectId: number) {
+    return await this.prisma.project.findFirst({
+      where: { id: projectId, userId },
+    });
+  }
+
+  public async updateProject(
     userId: number,
     projectId: number,
     updateProjectDto: UpdateProjectDto,
@@ -138,7 +296,7 @@ export class ProfileService {
 
     if (!project) {
       throw new NotFoundException(
-        'Project not found or does not belong to user'
+        'Project not found or does not belong to user',
       );
     }
 
@@ -147,6 +305,66 @@ export class ProfileService {
       where: { id: projectId },
       data: updateProjectDto,
     });
+  }
+
+  async uploadProjectVideo(userId: number, projectId: number, file: Express.Multer.File): Promise<{ videoUrl: string }> {
+    try {
+      // Check if project exists and belongs to the user
+      const project = await this.prisma.project.findFirst({
+        where: {
+          id: projectId,
+          userId,
+        },
+      });
+
+      if (!project) {
+        throw new NotFoundException(
+          'Project not found or does not belong to user',
+        );
+      }
+      
+      if (!file || !file.originalname || !file.buffer) {
+        throw new Error('Invalid file upload');
+      }
+
+      const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+      if (!validVideoTypes.includes(file.mimetype)) {
+        throw new Error('Invalid video format. Supported formats are MP4, WebM, and OGG.');
+      }
+
+      // Max size: 100MB
+      const maxSize = 100 * 1024 * 1024;
+      if (file.size > maxSize) {
+        throw new Error('Video file too large. Maximum size is 100MB.');
+      }
+
+      // Generate a unique filename
+      const fileExtension = path.extname(file.originalname);
+      const fileName = `project-video-${uuidv4()}${fileExtension}`;
+      
+      // Define upload directory and create it if it doesn't exist
+      const uploadDir = path.resolve('./uploads');
+      await fs.mkdir(uploadDir, { recursive: true });
+      
+      // Save the file
+      const filePath = path.join(uploadDir, fileName);
+      await fs.writeFile(filePath, file.buffer);
+      
+      // Generate a URL for the video
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
+      const videoUrl = `${baseUrl}/uploads/${fileName}`;
+      
+      // Update project with video URL
+      await this.prisma.project.update({
+        where: { id: projectId },
+        data: { videoUrl },
+      });
+
+      return { videoUrl };
+    } catch (error) {
+      console.error('Error uploading project video:', error);
+      throw new Error(`Failed to upload project video: ${error.message}`);
+    }
   }
 
   async deleteProject(userId: number, projectId: number) {
@@ -160,7 +378,7 @@ export class ProfileService {
 
     if (!project) {
       throw new NotFoundException(
-        'Project not found or does not belong to user'
+        'Project not found or does not belong to user',
       );
     }
 

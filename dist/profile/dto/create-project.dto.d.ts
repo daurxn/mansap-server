@@ -3,4 +3,5 @@ export declare class CreateProjectDto {
     description: string;
     imageUrl?: string;
     projectUrl?: string;
+    videoUrl?: string;
 }

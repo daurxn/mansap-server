@@ -21,4 +21,9 @@ export class CreateProjectDto {
   @IsOptional()
   @IsString()
   projectUrl?: string;
+  
+  @ApiProperty({ description: 'URL to project video', required: false })
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
 }

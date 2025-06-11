@@ -66,6 +66,8 @@ model Profile {
   locationId Int? // Foreign key to Location (optional, if location is not mandatory)
   location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull) // If Location deleted, set null
   bio        String?
+  imageUrl   String?   // URL to profile image
+  videoUrl   String?   // URL to profile video
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
@@ -260,6 +262,7 @@ model Project {
   title       String
   description String   @db.Text
   imageUrl    String?
+  videoUrl    String?
   projectUrl  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
