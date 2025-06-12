@@ -30,8 +30,8 @@ let JobsController = class JobsController {
     create(createJobDto, req) {
         return this.jobsService.create(createJobDto, req.user.id);
     }
-    findAll(req, search) {
-        return this.jobsService.findAll(req.user.id, search);
+    findAll(req, search, locationId) {
+        return this.jobsService.findAll(req.user.id, search, locationId ? parseInt(locationId) : undefined);
     }
     findPostedByMe(req) {
         return this.jobsService.findByPostedById(req.user.id);
@@ -72,8 +72,9 @@ __decorate([
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Query)('search')),
+    __param(2, (0, common_1.Query)('locationId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", void 0)
 ], JobsController.prototype, "findAll", null);
 __decorate([

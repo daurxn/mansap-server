@@ -8,84 +8,92 @@ export declare class JobsService {
     private chatService;
     constructor(prisma: PrismaService, chatService: ChatService);
     create(createJobDto: CreateJobDto, postedById: number): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
-    findAll(userId: number, search?: string): Promise<({
-        name: string;
+    findAll(userId: number, search?: string, locationId?: number): Promise<({
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     } & {
         applied: boolean;
         is_applicable: boolean;
     })[]>;
     findByPostedById(id: number): import(".prisma/client").Prisma.PrismaPromise<({
-        location: {
-            name: string;
-            id: number;
-        } | null;
-        _count: {
-            applications: number;
-        };
-        tags: {
-            name: string;
-            id: number;
-        }[];
         postedBy: {
             name: string;
             email: string;
         };
+        tags: {
+            id: number;
+            name: string;
+        }[];
+        location: {
+            id: number;
+            name: string;
+        } | null;
+        _count: {
+            applications: number;
+        };
     } & {
-        name: string;
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     })[]>;
     findOne(userId: number, id: number): Promise<{
         is_applicable: boolean;
         applied: boolean | null;
+        postedBy?: {
+            id: number;
+            name: string;
+            email: string;
+        } | undefined;
+        tags?: {
+            name: string;
+        }[] | undefined;
         applications?: ({
             resume: {
                 id: number;
@@ -96,107 +104,99 @@ export declare class JobsService {
                 education: string;
             } | null;
             applicant: {
+                id: number;
                 name: string;
+                createdAt: Date;
+                updatedAt: Date;
                 email: string;
                 password: string;
                 role: import(".prisma/client").$Enums.Role;
-                id: number;
-                createdAt: Date;
-                updatedAt: Date;
             };
         } & {
             id: number;
             updatedAt: Date;
-            status: import(".prisma/client").$Enums.ApplicationStatus;
             jobId: number;
             applicantId: number;
             resumeId: number | null;
             coverLetter: string | null;
+            status: import(".prisma/client").$Enums.ApplicationStatus;
             appliedAt: Date;
         })[] | undefined;
-        tags?: {
-            name: string;
-        }[] | undefined;
-        postedBy?: {
-            name: string;
-            email: string;
-            id: number;
-        } | undefined;
-        name?: string | undefined;
         id?: number | undefined;
-        createdAt?: Date | undefined;
-        updatedAt?: Date | undefined;
-        locationId?: number | null | undefined;
+        name?: string | undefined;
         description?: string | undefined;
+        requirements?: string | null | undefined;
+        responsibilities?: string | null | undefined;
         salary?: import("@prisma/client/runtime/library").Decimal | undefined;
         unit?: import(".prisma/client").$Enums.Unit | undefined;
         experienceLevel?: import(".prisma/client").$Enums.ExperienceLevel | undefined;
         jobType?: import(".prisma/client").$Enums.JobType | undefined;
-        requirements?: string | null | undefined;
-        responsibilities?: string | null | undefined;
         applicationDeadline?: Date | null | undefined;
         isRemote?: boolean | undefined;
         companyInfo?: string | null | undefined;
+        createdAt?: Date | undefined;
+        updatedAt?: Date | undefined;
         postedById?: number | undefined;
         filledById?: number | null | undefined;
+        locationId?: number | null | undefined;
     }>;
     update(id: number, updateJobDto: UpdateJobDto): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     remove(id: number): import(".prisma/client").Prisma.Prisma__JobClient<{
-        name: string;
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
     createApplication(applicantId: number, createApplicationDto: CreateApplicationDto): Promise<({
         job: {
-            name: string;
             id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            locationId: number | null;
+            name: string;
             description: string;
+            requirements: string | null;
+            responsibilities: string | null;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
-            requirements: string | null;
-            responsibilities: string | null;
             applicationDeadline: Date | null;
             isRemote: boolean;
             companyInfo: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             postedById: number;
             filledById: number | null;
+            locationId: number | null;
         };
         resume: {
             id: number;
@@ -207,88 +207,88 @@ export declare class JobsService {
             education: string;
         } | null;
         applicant: {
+            id: number;
             name: string;
             email: string;
-            id: number;
         };
     } & {
         id: number;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.ApplicationStatus;
         jobId: number;
         applicantId: number;
         resumeId: number | null;
         coverLetter: string | null;
+        status: import(".prisma/client").$Enums.ApplicationStatus;
         appliedAt: Date;
     }) | undefined>;
     getApplications(userId: number): import(".prisma/client").Prisma.PrismaPromise<({
         job: {
-            location: {
-                name: string;
+            postedBy: {
                 id: number;
+                name: string;
+                createdAt: Date;
+                updatedAt: Date;
+                email: string;
+                password: string;
+                role: import(".prisma/client").$Enums.Role;
+            };
+            tags: {
+                id: number;
+                name: string;
+            }[];
+            location: {
+                id: number;
+                name: string;
             } | null;
             _count: {
                 applications: number;
             };
-            tags: {
-                name: string;
-                id: number;
-            }[];
-            postedBy: {
-                name: string;
-                email: string;
-                password: string;
-                role: import(".prisma/client").$Enums.Role;
-                id: number;
-                createdAt: Date;
-                updatedAt: Date;
-            };
         } & {
-            name: string;
             id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            locationId: number | null;
+            name: string;
             description: string;
+            requirements: string | null;
+            responsibilities: string | null;
             salary: import("@prisma/client/runtime/library").Decimal;
             unit: import(".prisma/client").$Enums.Unit;
             experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
             jobType: import(".prisma/client").$Enums.JobType;
-            requirements: string | null;
-            responsibilities: string | null;
             applicationDeadline: Date | null;
             isRemote: boolean;
             companyInfo: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             postedById: number;
             filledById: number | null;
+            locationId: number | null;
         };
     } & {
         id: number;
         updatedAt: Date;
-        status: import(".prisma/client").$Enums.ApplicationStatus;
         jobId: number;
         applicantId: number;
         resumeId: number | null;
         coverLetter: string | null;
+        status: import(".prisma/client").$Enums.ApplicationStatus;
         appliedAt: Date;
     })[]>;
     acceptApplication(userId: number, jobId: number, applicantId: number): Promise<{
-        name: string;
         id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        locationId: number | null;
+        name: string;
         description: string;
+        requirements: string | null;
+        responsibilities: string | null;
         salary: import("@prisma/client/runtime/library").Decimal;
         unit: import(".prisma/client").$Enums.Unit;
         experienceLevel: import(".prisma/client").$Enums.ExperienceLevel;
         jobType: import(".prisma/client").$Enums.JobType;
-        requirements: string | null;
-        responsibilities: string | null;
         applicationDeadline: Date | null;
         isRemote: boolean;
         companyInfo: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         postedById: number;
         filledById: number | null;
+        locationId: number | null;
     }>;
 }

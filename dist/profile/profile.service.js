@@ -11,9 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileService = void 0;
 const common_1 = require("@nestjs/common");
-const fs_1 = require("fs");
-const path = require("path");
 const uuid_1 = require("uuid");
+const supabase_config_1 = require("../config/supabase.config");
 const prisma_service_1 = require("../prisma/prisma.service");
 let ProfileService = class ProfileService {
     prisma;
@@ -23,40 +22,56 @@ let ProfileService = class ProfileService {
     async uploadProfileImage(userId, file) {
         try {
             if (!file || !file.originalname || !file.buffer) {
-                throw new Error('Invalid file upload');
+                throw new common_1.BadRequestException('Invalid file upload');
             }
-            const fileExtension = path.extname(file.originalname);
-            const fileName = `${(0, uuid_1.v4)()}${fileExtension}`;
-            const uploadDir = path.resolve('./uploads');
-            await fs_1.promises.mkdir(uploadDir, { recursive: true });
-            const filePath = path.join(uploadDir, fileName);
-            await fs_1.promises.writeFile(filePath, file.buffer);
-            const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-            const imageUrl = `${baseUrl}/uploads/${fileName}`;
-            return { imageUrl };
+            if (!file.mimetype.includes('image/')) {
+                throw new common_1.BadRequestException('Only image files are allowed');
+            }
+            const fileExt = file.originalname.split('.').pop();
+            const fileName = `profiles/${userId}/${(0, uuid_1.v4)()}.${fileExt}`;
+            const { error } = await supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                cacheControl: '3600',
+            });
+            if (error) {
+                throw new common_1.BadRequestException(`Failed to upload image: ${error.message}`);
+            }
+            const { data: publicUrlData } = supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .getPublicUrl(fileName);
+            return { imageUrl: publicUrlData.publicUrl };
         }
         catch (error) {
             console.error('Error uploading file:', error);
-            throw new Error('Failed to upload profile image');
+            throw new common_1.BadRequestException(error.message || 'Failed to upload profile image');
         }
     }
     async uploadProfileVideo(userId, file) {
         try {
             if (!file || !file.originalname || !file.buffer) {
-                throw new Error('Invalid file upload');
+                throw new common_1.BadRequestException('Invalid file upload');
             }
             const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
             if (!validVideoTypes.includes(file.mimetype)) {
-                throw new Error('Invalid video format. Supported formats are MP4, WebM, and OGG.');
+                throw new common_1.BadRequestException('Invalid video format. Supported formats are MP4, WebM, and OGG.');
             }
-            const fileExtension = path.extname(file.originalname);
-            const fileName = `video-${(0, uuid_1.v4)()}${fileExtension}`;
-            const uploadDir = path.resolve('./uploads');
-            await fs_1.promises.mkdir(uploadDir, { recursive: true });
-            const filePath = path.join(uploadDir, fileName);
-            await fs_1.promises.writeFile(filePath, file.buffer);
-            const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-            const videoUrl = `${baseUrl}/uploads/${fileName}`;
+            const fileExt = file.originalname.split('.').pop();
+            const fileName = `profiles/${userId}/video-${(0, uuid_1.v4)()}.${fileExt}`;
+            const { error } = await supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                cacheControl: '3600',
+            });
+            if (error) {
+                throw new common_1.BadRequestException(`Failed to upload video: ${error.message}`);
+            }
+            const { data: publicUrlData } = supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .getPublicUrl(fileName);
+            const videoUrl = publicUrlData.publicUrl;
             await this.prisma.profile.update({
                 where: { userId },
                 data: { videoUrl },
@@ -65,7 +80,7 @@ let ProfileService = class ProfileService {
         }
         catch (error) {
             console.error('Error uploading video:', error);
-            throw new Error(error.message || 'Failed to upload profile video');
+            throw new common_1.BadRequestException(error.message || 'Failed to upload profile video');
         }
     }
     async update(userId, updateProfileDto) {
@@ -236,24 +251,31 @@ let ProfileService = class ProfileService {
                 throw new common_1.NotFoundException('Project not found or does not belong to user');
             }
             if (!file || !file.originalname || !file.buffer) {
-                throw new Error('Invalid file upload');
+                throw new common_1.BadRequestException('Invalid file upload');
             }
             const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
             if (!validVideoTypes.includes(file.mimetype)) {
-                throw new Error('Invalid video format. Supported formats are MP4, WebM, and OGG.');
+                throw new common_1.BadRequestException('Invalid video format. Supported formats are MP4, WebM, and OGG.');
             }
             const maxSize = 100 * 1024 * 1024;
             if (file.size > maxSize) {
-                throw new Error('Video file too large. Maximum size is 100MB.');
+                throw new common_1.BadRequestException('Video file too large. Maximum size is 100MB.');
             }
-            const fileExtension = path.extname(file.originalname);
-            const fileName = `project-video-${(0, uuid_1.v4)()}${fileExtension}`;
-            const uploadDir = path.resolve('./uploads');
-            await fs_1.promises.mkdir(uploadDir, { recursive: true });
-            const filePath = path.join(uploadDir, fileName);
-            await fs_1.promises.writeFile(filePath, file.buffer);
-            const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-            const videoUrl = `${baseUrl}/uploads/${fileName}`;
+            const fileExt = file.originalname.split('.').pop();
+            const fileName = `projects/${projectId}/video-${(0, uuid_1.v4)()}.${fileExt}`;
+            const { error } = await supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                cacheControl: '3600',
+            });
+            if (error) {
+                throw new common_1.BadRequestException(`Failed to upload video: ${error.message}`);
+            }
+            const { data: publicUrlData } = supabase_config_1.supabaseClient.storage
+                .from(supabase_config_1.CHAT_IMAGES_BUCKET)
+                .getPublicUrl(fileName);
+            const videoUrl = publicUrlData.publicUrl;
             await this.prisma.project.update({
                 where: { id: projectId },
                 data: { videoUrl },
@@ -262,7 +284,7 @@ let ProfileService = class ProfileService {
         }
         catch (error) {
             console.error('Error uploading project video:', error);
-            throw new Error(`Failed to upload project video: ${error.message}`);
+            throw new common_1.BadRequestException(error.message || 'Failed to upload project video');
         }
     }
     async deleteProject(userId, projectId) {

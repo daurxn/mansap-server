@@ -15,8 +15,8 @@ export declare class AuthController {
         accessToken: string;
     }>;
     profile(req: AuthenticatedRequest): import(".prisma/client").Prisma.Prisma__UserClient<{
-        name: string;
         email: string;
+        name: string;
         role: import(".prisma/client").$Enums.Role;
         id: number;
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;

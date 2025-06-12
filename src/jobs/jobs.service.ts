@@ -32,10 +32,11 @@ export class JobsService {
     return this.prisma.job.create({ data: newJob });
   }
 
-  async findAll(userId: number, search?: string) {
+  async findAll(userId: number, search?: string, locationId?: number) {
     // build dynamic where clauses
     const where: Record<string, any> = {};
 
+    // Search filter
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -48,18 +49,13 @@ export class JobsService {
       ];
     }
 
+    // Location filter
+    if (locationId) {
+      where.locationId = locationId;
+    }
+
     const jobs = await this.prisma.job.findMany({
-      where: {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-          {
-            tags: {
-              some: { name: { contains: search, mode: 'insensitive' } },
-            },
-          },
-        ],
-      },
+      where,
       include: {
         postedBy: { select: { email: true, name: true } },
         tags: { select: { name: true } },

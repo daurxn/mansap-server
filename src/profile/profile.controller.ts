@@ -25,7 +25,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 @Controller('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}
-  
+
   @Post('upload')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
@@ -60,7 +60,7 @@ export class ProfileController {
   getProfile(@Request() req: AuthenticatedRequest) {
     return this.profileService.getProfile(req.user.id);
   }
-  
+
   @Get('all')
   getAllProfiles() {
     return this.profileService.getAllProfiles();
@@ -95,7 +95,7 @@ export class ProfileController {
   getProjects(@Request() req: AuthenticatedRequest) {
     return this.profileService.getProjects(req.user.id);
   }
-  
+
   @Post('projects/:id/upload-video')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))

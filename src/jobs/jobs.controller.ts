@@ -40,8 +40,13 @@ export class JobsController {
   findAll(
     @Request() req: AuthenticatedRequest,
     @Query('search') search?: string,
+    @Query('locationId') locationId?: string,
   ) {
-    return this.jobsService.findAll(req.user.id, search);
+    return this.jobsService.findAll(
+      req.user.id,
+      search,
+      locationId ? parseInt(locationId) : undefined,
+    );
   }
 
   @Get('mine')

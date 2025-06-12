@@ -33,7 +33,7 @@ let JobsService = class JobsService {
         };
         return this.prisma.job.create({ data: newJob });
     }
-    async findAll(userId, search) {
+    async findAll(userId, search, locationId) {
         const where = {};
         if (search) {
             where.OR = [
@@ -46,18 +46,11 @@ let JobsService = class JobsService {
                 },
             ];
         }
+        if (locationId) {
+            where.locationId = locationId;
+        }
         const jobs = await this.prisma.job.findMany({
-            where: {
-                OR: [
-                    { name: { contains: search, mode: 'insensitive' } },
-                    { description: { contains: search, mode: 'insensitive' } },
-                    {
-                        tags: {
-                            some: { name: { contains: search, mode: 'insensitive' } },
-                        },
-                    },
-                ],
-            },
+            where,
             include: {
                 postedBy: { select: { email: true, name: true } },
                 tags: { select: { name: true } },
